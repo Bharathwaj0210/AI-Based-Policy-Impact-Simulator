@@ -1,0 +1,101 @@
+age,sex,bmi,children,smoker,region,income,education,employment_status,pre_existing_conditions,exercise_frequency,occupation_risk,hospital_visits_last_year,blood_pressure,cholesterol_level,daily_steps,alcohol_consumption,years_as_customer,policy_type,urban_vs_rural,genetic_risk_score,marital_status,claim_frequency,location_risk_score,charges
+56,female,36.0,3,no,northeast,118092,PhD,Self-Employed,0,Active,0.77,6,133,165,9657,High,14,Gold,Urban,0.489,Married,4,0.516,68326.78
+69,female,40.3,3,no,southeast,84693,Bachelor,Self-Employed,2,Moderate,0.55,0,139,294,4466,Medium,11,Basic,Rural,0.667,Married,0,0.919,12356.19
+46,female,22.5,2,yes,northeast,56962,PhD,Unemployed,2,Moderate,0.31,3,168,175,12929,Low,15,Silver,Rural,0.14,Single,0,0.497,41618.09
+32,female,37.3,0,no,northwest,58295,Bachelor,Self-Employed,2,Active,0.91,8,123,235,11041,Medium,7,Silver,Urban,0.03,Single,1,0.992,16253.65
+60,male,35.3,2,no,northwest,43807,PhD,Retired,4,Active,0.45,0,118,284,12301,High,13,Gold,Urban,0.308,Widowed,2,0.851,29350.69
+25,female,24.5,0,no,southwest,72348,Bachelor,Self-Employed,1,Moderate,0.59,3,149,163,9312,Low,16,Silver,Urban,0.705,Married,4,0.209,60301.78
+78,male,48.2,4,no,southeast,56432,PhD,Retired,4,Moderate,0.92,5,175,228,10194,Low,7,Silver,Urban,0.202,Single,1,0.931,40701.36
+38,female,37.2,1,no,northeast,113285,PhD,Unemployed,1,Rarely,0.66,5,134,266,14447,Low,14,Gold,Urban,0.673,Married,2,0.116,33191.62
+56,female,40.2,1,no,northwest,136995,High School,Unemployed,2,Moderate,0.21,7,131,156,9906,High,13,Basic,Rural,0.97,Divorced,1,0.817,34585.72
+75,male,46.2,1,no,northwest,121792,High School,Unemployed,2,Moderate,0.95,0,113,286,14261,Medium,17,Basic,Rural,0.094,Divorced,4,0.381,39458.51
+36,female,38.0,2,no,northeast,87854,PhD,Unemployed,4,Active,0.66,6,135,264,6876,Low,19,Basic,Rural,0.673,Divorced,0,0.878,63876.24
+40,male,27.5,4,yes,southwest,70262,PhD,Unemployed,4,Moderate,0.4,0,167,221,9287,High,6,Gold,Rural,0.444,Widowed,0,0.868,71906.35
+28,female,21.4,0,no,northwest,67080,Master,Retired,1,Rarely,0.23,6,138,208,2892,Medium,2,Silver,Urban,0.868,Married,2,0.806,76650.1
+28,female,32.6,3,no,southeast,31324,Bachelor,Retired,3,Moderate,0.81,2,146,231,12222,High,11,Gold,Urban,0.177,Divorced,3,0.79,64017.75
+41,male,25.0,0,yes,northwest,121267,Master,Unemployed,1,Active,0.66,7,179,265,13352,Medium,2,Gold,Urban,0.693,Single,2,0.305,28655.52
+70,female,31.3,3,yes,southeast,65909,High School,Self-Employed,4,Active,0.58,2,127,295,12568,High,19,Silver,Urban,0.838,Divorced,3,0.081,56610.1
+53,male,46.3,0,no,northeast,119339,High School,Employed,4,Moderate,0.9,0,151,252,6675,Medium,13,Basic,Urban,0.945,Divorced,1,0.403,37820.23
+57,female,28.4,4,no,southeast,49870,High School,Unemployed,0,Active,0.81,7,150,166,3933,Low,14,Basic,Rural,0.683,Divorced,1,0.174,24100.3
+41,male,21.9,3,yes,northeast,64578,High School,Self-Employed,4,Rarely,0.24,2,147,163,3380,Medium,13,Gold,Urban,0.497,Widowed,4,0.695,68065.37
+20,male,29.4,2,no,southeast,102124,PhD,Employed,0,Rarely,0.38,1,143,257,13873,High,6,Basic,Rural,0.618,Single,3,0.346,7881.98
+39,female,47.0,0,no,northeast,147611,High School,Unemployed,3,Moderate,0.32,0,126,194,3290,High,16,Gold,Rural,0.869,Married,4,0.976,72632.15
+70,female,26.7,0,no,southeast,133605,PhD,Unemployed,1,Moderate,0.77,2,146,247,3640,Medium,11,Gold,Rural,0.571,Single,0,0.641,39610.81
+19,male,38.7,3,no,southwest,56790,PhD,Retired,1,Moderate,0.13,1,134,280,9490,Low,19,Silver,Rural,0.03,Married,3,0.822,52790.11
+41,female,18.0,2,yes,southeast,148874,High School,Employed,0,Active,0.61,1,136,186,12874,Low,3,Silver,Urban,0.931,Widowed,2,0.133,54451.54
+61,female,29.3,2,yes,southeast,55289,High School,Employed,1,Rarely,0.79,5,166,257,11179,Medium,8,Silver,Rural,0.69,Widowed,0,0.862,72133.83
+47,female,27.8,4,no,southwest,85129,Bachelor,Self-Employed,4,Rarely,0.89,0,140,188,3218,Medium,5,Gold,Rural,0.677,Widowed,0,0.923,52750.23
+55,male,23.3,2,no,northwest,123714,Master,Retired,2,Active,0.41,1,115,164,7016,High,15,Silver,Rural,0.216,Widowed,2,0.487,51045.02
+19,male,35.1,2,yes,northwest,124246,High School,Retired,0,Rarely,0.84,5,149,269,8881,Low,1,Basic,Urban,0.659,Married,0,0.606,9998.9
+77,male,33.5,2,no,southeast,45485,Bachelor,Retired,1,Moderate,0.2,2,121,153,11547,Medium,7,Basic,Urban,0.394,Divorced,3,0.765,43880.6
+38,male,40.2,1,no,southwest,74482,Bachelor,Retired,0,Moderate,0.86,3,162,242,14457,Low,10,Gold,Urban,0.651,Married,4,0.175,16262.68
+50,male,26.6,4,no,southeast,116188,Master,Employed,0,Moderate,0.21,0,119,290,14808,Medium,12,Gold,Rural,0.107,Single,0,0.503,60307.53
+29,male,25.8,0,yes,northeast,34748,PhD,Employed,2,Rarely,0.46,7,154,165,14327,Medium,16,Silver,Rural,0.658,Widowed,3,0.399,43416.64
+75,male,23.4,3,yes,northeast,116769,High School,Unemployed,4,Moderate,0.82,6,126,257,11752,Low,7,Gold,Urban,0.999,Widowed,1,0.146,56017.08
+39,male,25.0,0,no,southeast,39435,Master,Unemployed,0,Active,0.23,6,135,275,11610,Medium,17,Gold,Rural,0.048,Single,3,0.368,8125.47
+78,male,35.9,4,no,northwest,33709,High School,Retired,1,Active,0.31,2,171,204,2954,Medium,17,Basic,Urban,0.977,Married,4,0.068,11359.4
+61,female,30.9,3,no,northwest,60355,Bachelor,Retired,3,Rarely,0.75,9,155,183,11175,High,13,Basic,Urban,0.407,Divorced,3,0.026,58724.25
+42,male,20.1,4,no,southeast,85771,Bachelor,Retired,0,Active,0.75,9,173,162,9291,Medium,14,Silver,Rural,0.871,Divorced,2,0.135,10406.33
+66,female,26.1,2,no,southeast,87799,PhD,Unemployed,0,Active,0.68,2,111,290,2974,Medium,5,Gold,Rural,0.782,Single,4,0.963,10344.25
+44,female,25.9,3,no,northeast,43116,Bachelor,Self-Employed,2,Rarely,0.72,1,163,167,6133,Medium,10,Gold,Rural,0.567,Divorced,1,0.55,5908.14
+76,female,40.3,2,yes,northwest,55470,Bachelor,Self-Employed,4,Moderate,0.59,0,174,245,7370,High,12,Basic,Rural,0.738,Married,2,0.966,76737.6
+59,male,40.8,0,no,southeast,72344,Master,Unemployed,3,Moderate,0.33,6,160,272,5972,Low,0,Gold,Urban,0.879,Married,3,0.432,60313.13
+45,male,22.7,0,yes,northeast,72918,High School,Unemployed,1,Moderate,0.41,6,162,188,7295,High,5,Basic,Urban,0.404,Single,4,0.312,31493.86
+77,male,49.9,3,yes,northwest,82224,High School,Unemployed,3,Rarely,0.26,1,145,195,11105,High,8,Silver,Urban,0.327,Married,1,0.506,27240.17
+33,male,26.5,3,no,southwest,69298,Master,Unemployed,1,Active,0.92,6,135,178,14741,Low,7,Basic,Urban,0.668,Widowed,2,0.44,31227.74
+32,female,49.3,4,yes,northeast,138492,PhD,Unemployed,4,Moderate,0.63,7,138,211,10228,High,10,Gold,Urban,0.808,Single,1,0.106,63099.01
+79,male,31.2,4,yes,northwest,110219,High School,Unemployed,1,Moderate,0.46,0,130,165,13579,Low,18,Silver,Rural,0.762,Married,3,0.641,54602.8
+79,male,19.1,2,no,northwest,91629,Bachelor,Retired,2,Rarely,0.52,8,120,270,11903,High,8,Basic,Urban,0.798,Single,1,0.216,18889.67
+64,male,29.0,3,no,northeast,96040,High School,Retired,2,Moderate,0.95,6,149,159,5020,Low,16,Basic,Urban,0.436,Divorced,0,0.62,18058.2
+79,male,38.3,0,yes,southwest,129518,Bachelor,Retired,2,Rarely,0.24,2,120,252,10987,Medium,11,Silver,Urban,0.818,Married,2,0.65,12379.67
+68,male,39.8,4,yes,northeast,129835,PhD,Retired,2,Active,0.63,7,145,233,6036,High,13,Silver,Rural,0.12,Widowed,1,0.152,54522.7
+61,female,35.0,4,no,northwest,58016,Master,Unemployed,3,Rarely,0.56,6,168,282,7068,High,14,Basic,Rural,0.544,Married,3,0.061,62327.95
+72,male,32.3,0,no,southeast,53960,High School,Self-Employed,4,Rarely,0.65,7,148,214,14880,High,15,Gold,Rural,0.006,Single,3,0.781,24878.48
+69,female,35.7,4,no,southeast,63591,Master,Employed,1,Rarely,0.12,5,163,152,7233,High,19,Basic,Rural,0.325,Single,1,0.46,6570.87
+74,male,37.0,2,no,northeast,112848,High School,Unemployed,1,Rarely,0.88,8,164,291,13303,Medium,0,Silver,Urban,0.366,Married,3,0.058,11162.88
+20,female,20.6,3,no,northwest,133333,Bachelor,Employed,2,Active,0.94,4,133,269,11516,High,9,Basic,Urban,0.396,Widowed,4,0.995,77589.5
+54,male,29.8,0,yes,southeast,141732,Master,Self-Employed,2,Active,0.61,2,131,217,2317,Medium,7,Silver,Rural,0.695,Widowed,4,0.058,27158.36
+68,male,25.7,3,no,northwest,144821,High School,Retired,0,Moderate,0.73,2,178,295,4396,Medium,17,Silver,Rural,0.389,Widowed,4,0.695,62691.74
+24,female,43.7,4,no,northeast,97641,Bachelor,Self-Employed,4,Active,0.93,0,165,186,4162,Medium,0,Gold,Urban,0.449,Single,0,0.984,51849.77
+38,female,33.0,4,no,southeast,66395,Master,Unemployed,3,Active,0.74,7,142,222,4745,Medium,1,Silver,Urban,0.238,Married,1,0.239,33645.47
+26,female,49.5,0,yes,northwest,141276,Master,Retired,1,Moderate,0.24,1,145,292,3591,Low,0,Silver,Rural,0.373,Divorced,0,0.142,20426.54
+56,male,30.8,2,no,southeast,52700,High School,Unemployed,0,Active,0.62,2,129,198,13303,Low,0,Gold,Rural,0.227,Single,3,0.121,14103.98
+35,female,44.1,1,no,northeast,64620,High School,Retired,0,Rarely,0.65,7,171,270,8183,High,8,Silver,Rural,0.073,Widowed,0,0.303,51125.97
+21,male,43.5,0,no,northwest,133214,High School,Employed,1,Rarely,0.48,7,135,237,5930,Low,12,Gold,Rural,0.603,Married,3,0.101,63097.53
+42,male,22.8,1,no,southeast,50559,Bachelor,Employed,3,Moderate,0.76,3,175,289,12188,Low,0,Gold,Urban,0.668,Widowed,3,0.692,53292.82
+77,female,34.3,1,no,northeast,123045,High School,Employed,0,Moderate,0.94,3,149,186,3312,High,12,Silver,Urban,0.619,Divorced,2,0.062,44772.66
+31,female,40.3,2,no,southeast,123396,Master,Self-Employed,0,Moderate,0.93,4,126,210,11477,High,19,Silver,Urban,0.463,Widowed,4,0.509,8146.34
+67,male,45.5,1,no,southeast,91642,Master,Unemployed,4,Rarely,0.51,5,110,273,6311,High,6,Basic,Rural,0.38,Widowed,3,0.997,77636.66
+75,male,28.4,1,no,southwest,106539,High School,Self-Employed,3,Active,0.2,4,170,188,9314,Low,1,Gold,Rural,0.863,Divorced,2,0.814,64903.56
+26,female,25.0,2,no,southwest,51732,High School,Employed,0,Rarely,0.99,6,152,212,4383,Low,5,Basic,Urban,0.519,Married,4,0.615,26961.65
+43,female,40.8,1,no,northeast,121362,PhD,Unemployed,3,Moderate,0.86,1,151,195,5239,High,6,Silver,Urban,0.479,Single,3,0.306,78497.77
+70,female,43.9,1,no,southwest,60354,Master,Employed,1,Active,0.21,6,134,237,4139,Medium,13,Basic,Urban,0.026,Married,3,0.624,50141.12
+19,male,29.2,1,no,northeast,43843,Bachelor,Self-Employed,2,Active,0.93,9,148,160,3704,High,17,Gold,Urban,0.341,Divorced,0,0.527,48681.7
+37,male,21.1,0,yes,southwest,140008,PhD,Self-Employed,0,Rarely,0.88,6,144,211,8924,Medium,14,Basic,Rural,0.38,Widowed,0,0.426,61105.49
+45,male,48.1,0,no,southeast,144065,High School,Self-Employed,4,Moderate,0.57,0,112,226,2362,Medium,1,Gold,Urban,0.399,Married,4,0.131,65882.73
+64,male,30.7,0,no,northeast,101726,High School,Employed,1,Rarely,0.63,6,153,201,4604,High,9,Silver,Urban,0.58,Single,3,0.887,54235.9
+77,male,34.6,2,no,northeast,47640,Master,Unemployed,3,Active,0.46,4,160,153,11908,High,11,Silver,Urban,0.534,Divorced,1,0.45,14607.18
+24,male,44.8,4,no,southeast,82528,High School,Unemployed,1,Rarely,0.15,2,121,208,14643,High,16,Gold,Urban,0.608,Married,0,0.195,30370.06
+61,female,39.6,1,no,northeast,68413,Bachelor,Employed,0,Rarely,0.4,2,128,221,6286,Low,7,Silver,Urban,0.765,Single,4,0.368,74606.27
+78,male,41.5,1,no,northeast,82638,Master,Unemployed,3,Moderate,0.82,3,153,297,5738,Medium,10,Silver,Urban,0.813,Divorced,3,0.414,21846.17
+25,male,24.7,2,no,southwest,82736,High School,Employed,2,Moderate,0.1,1,168,242,4469,Low,2,Silver,Urban,0.718,Single,3,0.828,32912.53
+64,male,35.3,1,no,northeast,137892,Master,Unemployed,1,Active,0.4,1,158,212,6795,Low,5,Silver,Rural,0.956,Divorced,1,0.734,37405.77
+52,female,40.3,0,no,northwest,140133,High School,Retired,0,Rarely,0.46,0,170,203,8150,High,8,Gold,Rural,0.018,Widowed,4,0.769,37955.37
+31,male,25.3,4,yes,southeast,136357,High School,Retired,4,Rarely,0.58,4,126,266,2556,Low,5,Basic,Rural,0.196,Married,3,0.011,50970.47
+34,male,23.6,3,no,southwest,98866,High School,Self-Employed,3,Rarely,0.93,3,166,259,11017,High,8,Basic,Rural,0.008,Single,0,0.416,75730.69
+53,female,49.4,1,no,southwest,49087,Bachelor,Retired,1,Active,0.41,9,164,223,4808,Medium,6,Silver,Urban,0.647,Divorced,1,0.481,23051.95
+67,male,34.5,0,no,northwest,71430,Bachelor,Retired,1,Active,0.41,1,156,256,7150,High,8,Basic,Rural,0.898,Single,4,0.019,14112.6
+57,male,26.3,3,no,southeast,54504,Master,Retired,2,Moderate,0.76,2,121,206,14713,Low,17,Basic,Rural,0.243,Single,1,0.26,19810.29
+21,male,49.9,4,no,southeast,37114,High School,Employed,2,Moderate,0.51,6,171,152,9561,Low,11,Silver,Urban,0.927,Married,0,0.76,71519.37
+19,male,48.9,3,no,southwest,108859,High School,Retired,4,Moderate,0.3,6,117,269,4719,High,7,Silver,Urban,0.06,Widowed,4,0.137,53435.81
+79,male,35.9,0,no,northeast,129657,Bachelor,Retired,4,Rarely,0.51,3,130,155,8506,High,7,Basic,Rural,0.934,Single,1,0.535,26443.01
+23,female,46.2,3,no,southwest,40975,High School,Self-Employed,0,Rarely,0.23,4,179,154,13700,Low,17,Gold,Rural,0.352,Divorced,2,0.215,66196.02
+71,female,24.0,2,no,southeast,41023,Bachelor,Retired,0,Moderate,0.26,4,134,154,5741,Medium,19,Silver,Urban,0.101,Divorced,0,0.012,69602.75
+59,female,26.9,3,no,northwest,51447,High School,Retired,4,Rarely,0.55,5,121,203,11766,Medium,14,Gold,Rural,0.486,Widowed,0,0.241,68488.58
+21,male,40.4,1,no,southwest,120469,Master,Unemployed,4,Moderate,0.48,8,124,196,5998,High,6,Basic,Urban,0.257,Divorced,0,0.976,73919.49
+71,male,45.1,1,yes,southeast,53959,High School,Self-Employed,3,Active,0.92,1,168,158,12321,Medium,10,Silver,Urban,0.285,Widowed,2,0.802,23918.08
+46,male,45.4,2,no,southwest,96203,High School,Self-Employed,2,Moderate,0.43,4,135,248,4403,Low,19,Gold,Urban,0.307,Divorced,2,0.96,61628.14
+35,female,30.9,0,no,northeast,149156,PhD,Self-Employed,0,Active,0.62,2,135,169,13521,High,15,Silver,Urban,0.803,Married,3,0.488,39540.46
+43,male,46.4,1,no,southwest,59703,Bachelor,Self-Employed,2,Rarely,0.67,3,156,271,10780,Low,3,Basic,Rural,0.539,Single,1,0.11,68149.89
+61,male,45.2,4,no,southwest,39337,High School,Self-Employed,2,Moderate,0.11,9,141,210,12204,Low,5,Gold,Urban,0.311,Married,3,0.548,59636.8
+51,female,47.9,1,no,southeast,76427,High School,Self-Employed,4,Rarely,0.7,5,119,272,11739,Medium,2,Basic,Urban,0.61,Single,1,0.454,63233.56
