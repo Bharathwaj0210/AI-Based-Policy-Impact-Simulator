@@ -1,0 +1,44 @@
+import pandas as pd
+import numpy as np
+import random
+
+# 1. Load the existing gov_scheme_data.csv
+df = pd.read_csv('gov_scheme_data.csv')
+num_rows = len(df)
+
+# 2. Define possible values for simulation
+levels = ['Central', 'State']
+categories = ['Education & Learning', 'Healthcare', 'Skill Development', 'Social Welfare', 'Housing', 'Agriculture']
+benefit_types = ['Scholarship', 'Grant', 'Stipend', 'Direct Benefit Transfer', 'Subsidy']
+social_categories = ['SC', 'ST', 'OBC', 'General', 'EWS', 'Any']
+genders = ['Male', 'Female', 'Non-Binary', 'Any']
+course_levels = ['School', 'Higher Secondary', 'UG', 'PG', 'Diploma', 'PhD', 'Vocational']
+app_modes = ['Online', 'Offline', 'Online+Offline']
+
+# 3. Add the requested columns by simulating data
+df['level'] = [random.choice(levels) for _ in range(num_rows)]
+
+# state_ut logic: If the level is 'State', use the record's actual State; otherwise, use 'All India'
+df['state_ut'] = df.apply(lambda row: row['State'] if row['level'] == 'State' else 'All India', axis=1)
+
+df['schemeCategory'] = [random.choice(categories) for _ in range(num_rows)]
+df['benefit_type'] = [random.choice(benefit_types) for _ in range(num_rows)]
+df['benefit_amount_per_year'] = [random.randint(5, 100) * 1000 for _ in range(num_rows)]
+df['min_age'] = [random.randint(0, 25) for _ in range(num_rows)]
+df['max_age'] = [random.randint(30, 80) for _ in range(num_rows)]
+df['income_limit'] = [random.choice([200000, 300000, 500000, 800000]) for _ in range(num_rows)]
+df['social_category'] = [random.choice(social_categories) for _ in range(num_rows)]
+df['gender_target'] = [random.choice(genders) for _ in range(num_rows)]
+df['course_level'] = [random.choice(course_levels) for _ in range(num_rows)]
+df['application_mode'] = [random.choice(app_modes) for _ in range(num_rows)]
+
+# 4. Add additional context columns for completeness
+df['scheme_name'] = [f"Gov Assistance Scheme - {random.randint(100, 999)}" for _ in range(num_rows)]
+df['details'] = "This scheme provides financial support to individuals meeting the eligibility criteria."
+df['documents_required'] = "Identity Proof, Address Proof, Income Certificate"
+df['tags'] = "Gov, Social Welfare, Support"
+
+# 5. Save the enriched dataset
+df.to_csv('enriched_gov_scheme_data.csv', index=False)
+
+print("Successfully created 'enriched_gov_scheme_data.csv'")

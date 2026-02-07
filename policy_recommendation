@@ -1,0 +1,95 @@
+import pandas as pd
+
+# ===============================
+# ORIGINAL POLICY RULES
+# ===============================
+def original_policy(age, residence, occupation, pension, cooperative):
+    if age < 18 or age > 60:
+        return 0
+    if residence != "Puducherry":
+        return 0
+    if occupation != "Fisherman":
+        return 0
+    if pension == "Yes":
+        return 0
+    if cooperative != "Yes":
+        return 0
+    return 1
+
+# ===============================
+# RECOMMENDED POLICY RULES
+# (Relaxed but realistic)
+# ===============================
+def recommended_policy(age, residence, occupation, pension, cooperative):
+    # Recommendation 1: Extend age limit
+    if age < 18 or age > 65:
+        return 0
+
+    # Recommendation 2: Allow nearby residents in disaster cases
+    if residence not in ["Puducherry", "Tamil Nadu"]:
+        return 0
+
+    # Recommendation 3: Allow allied fishing occupations
+    if occupation not in ["Fisherman", "Fish Vendor", "Boat Worker"]:
+        return 0
+
+    # Recommendation 4: Allow pensioners with reduced benefit
+    if pension == "Yes":
+        return 0  # can be changed to partial benefit in future
+
+    # Recommendation 5: Cooperative membership optional
+    return 1
+
+# ===============================
+# APPLICANT DATA (SAME AS FAIRNESS STEP)
+# ===============================
+data = pd.DataFrame({
+    "age": [25, 45, 62, 35, 55, 40, 30, 58],
+    "residence": ["Puducherry", "Puducherry", "Puducherry", "Tamil Nadu",
+                  "Puducherry", "Tamil Nadu", "Puducherry", "Puducherry"],
+    "occupation": ["Fisherman", "Fisherman", "Fisherman", "Fisherman",
+                   "Farmer", "Fisherman", "Farmer", "Fisherman"],
+    "pension": ["No", "No", "No", "No", "No", "Yes", "No", "No"],
+    "cooperative": ["Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "No"]
+})
+
+# ===============================
+# APPLY BOTH POLICIES
+# ===============================
+data["eligible_original"] = data.apply(
+    lambda row: original_policy(
+        row["age"],
+        row["residence"],
+        row["occupation"],
+        row["pension"],
+        row["cooperative"]
+    ),
+    axis=1
+)
+
+data["eligible_recommended"] = data.apply(
+    lambda row: recommended_policy(
+        row["age"],
+        row["residence"],
+        row["occupation"],
+        row["pension"],
+        row["cooperative"]
+    ),
+    axis=1
+)
+
+# ===============================
+# COMPARISON RESULTS
+# ===============================
+print("\n📊 POLICY COMPARISON RESULTS")
+print(data)
+
+print("\n✅ Original Policy Eligibility Rate:",
+      data["eligible_original"].mean())
+
+print("🚀 Recommended Policy Eligibility Rate:",
+      data["eligible_recommended"].mean())
+
+print("\n📈 Improvement:",
+      data["eligible_recommended"].mean() -
+      data["eligible_original"].mean())
