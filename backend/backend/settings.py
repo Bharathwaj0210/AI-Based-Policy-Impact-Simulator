@@ -25,7 +25,6 @@ INSTALLED_APPS = [
     'insurance',
     'government',
     'hr',
-    'predictor',
 ]
 
 MIDDLEWARE = [

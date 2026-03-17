@@ -1,0 +1,101 @@
+vehicle_age,vehicle_type,engine_capacity,fuel_type,vehicle_value,owner_age,owner_gender,driving_experience_years,accident_history,annual_mileage,claim_frequency,no_claim_bonus,policy_type,urban_vs_rural
+6,Compact,1036,CNG,845627,37,male,43,3,23276,1,50,Third Party,rural
+10,Luxury,1709,Petrol,4706596,69,male,31,4,23024,3,35,Comprehensive,rural
+10,Compact,3447,Electric,2951480,38,other,42,1,8171,2,35,Comprehensive,urban
+6,Hatchback,1126,Electric,4695878,66,male,30,4,26957,2,35,Own Damage Only,rural
+5,Compact,2894,CNG,1513173,25,male,1,1,4235,0,25,Comprehensive,urban
+14,Hatchback,3820,Diesel,3008689,24,other,15,3,11710,3,20,Own Damage Only,urban
+12,Sedan,3428,Electric,2322159,60,female,28,1,10340,3,50,Comprehensive,urban
+10,Hatchback,2853,Petrol,1814766,55,other,42,2,17551,1,0,Third Party,rural
+13,Hatchback,989,Diesel,3220767,55,other,18,0,3610,0,20,Comprehensive,urban
+9,Sedan,2203,CNG,4987480,29,female,41,4,24347,2,20,Own Damage Only,urban
+14,Compact,3389,CNG,3826600,49,female,4,2,23821,1,0,Own Damage Only,rural
+0,Luxury,3402,Petrol,3581339,63,other,8,4,23604,3,50,Own Damage Only,urban
+13,Compact,2552,CNG,3068594,73,other,43,2,23013,0,20,Third Party,rural
+3,Sedan,2244,CNG,1553685,74,female,33,4,7852,3,45,Comprehensive,urban
+4,Hatchback,2712,Diesel,1068409,63,male,12,0,19379,0,25,Comprehensive,urban
+9,Luxury,2769,Diesel,4252858,50,other,29,3,3901,1,0,Own Damage Only,urban
+13,Hatchback,994,Diesel,1802261,59,male,2,2,27967,2,35,Own Damage Only,urban
+3,Sedan,3080,Petrol,1696569,68,male,26,2,13519,3,0,Own Damage Only,rural
+1,Sedan,1334,Electric,1152320,47,male,18,1,23785,2,35,Third Party,urban
+9,Luxury,1973,Electric,3620753,70,male,24,0,15573,2,0,Comprehensive,urban
+9,SUV,1754,CNG,956606,26,other,16,2,12322,3,20,Third Party,rural
+0,Luxury,3234,CNG,2032433,65,other,27,2,3787,2,45,Comprehensive,rural
+6,Luxury,1836,CNG,1577810,24,male,37,0,25088,3,25,Third Party,urban
+11,Hatchback,2519,Electric,2543813,51,female,19,4,24122,2,25,Third Party,rural
+7,Luxury,2758,CNG,2542628,23,other,1,0,5487,3,50,Third Party,urban
+8,Luxury,1061,Diesel,4781447,59,other,35,2,7806,3,25,Comprehensive,rural
+9,Compact,1237,Petrol,4467670,64,female,26,0,13499,0,20,Comprehensive,rural
+8,SUV,2563,CNG,1210677,35,male,33,0,29878,0,25,Comprehensive,rural
+12,Hatchback,3418,Electric,863274,33,other,35,4,24406,3,45,Third Party,urban
+13,Sedan,2635,Petrol,2161639,60,other,25,1,25412,0,50,Own Damage Only,rural
+0,Hatchback,3787,Petrol,2572614,27,female,20,3,28321,3,45,Comprehensive,urban
+11,SUV,1284,Diesel,2566147,27,other,3,4,16430,3,35,Comprehensive,rural
+0,Compact,2600,Diesel,3100594,29,male,23,4,17145,2,25,Comprehensive,urban
+10,Compact,3269,CNG,1382761,65,male,20,2,22046,3,0,Comprehensive,rural
+7,Sedan,1207,CNG,4611449,31,female,31,3,13307,3,50,Comprehensive,urban
+7,Luxury,1804,Petrol,2220755,46,male,12,2,8931,0,25,Comprehensive,urban
+3,Luxury,2072,CNG,4982942,46,male,6,1,6325,3,45,Own Damage Only,urban
+12,SUV,1068,Electric,2618502,22,male,26,1,17880,1,45,Third Party,urban
+7,Compact,827,Diesel,3125231,73,other,38,4,7325,1,20,Third Party,rural
+10,Compact,2208,CNG,2393565,43,female,11,3,23375,2,0,Comprehensive,rural
+1,Compact,3235,CNG,4344709,38,male,3,4,7244,3,20,Third Party,urban
+5,Sedan,1663,Electric,939838,30,female,27,1,18890,2,45,Comprehensive,urban
+11,Compact,2207,CNG,1820692,65,female,20,0,3185,0,0,Third Party,urban
+4,Sedan,998,Diesel,4582182,45,male,5,3,29069,2,35,Comprehensive,rural
+9,Luxury,3379,CNG,2789676,64,male,27,0,21010,2,35,Own Damage Only,rural
+9,Compact,1161,Diesel,4297284,56,female,5,4,20692,3,0,Third Party,rural
+9,Hatchback,3743,Petrol,3674737,33,other,8,2,13326,3,20,Comprehensive,urban
+12,SUV,2776,Electric,1725225,72,female,17,4,16494,1,0,Own Damage Only,rural
+1,Sedan,2390,Electric,1788552,48,female,5,4,15517,2,0,Third Party,rural
+10,Luxury,2488,Diesel,2348525,68,male,17,2,10289,3,50,Own Damage Only,urban
+10,Compact,1749,CNG,904876,50,female,15,4,7640,0,35,Third Party,urban
+2,Sedan,2401,Diesel,2187566,44,other,32,4,9805,3,35,Third Party,rural
+2,Compact,2646,Diesel,1024453,42,other,21,4,29785,1,20,Third Party,rural
+6,Hatchback,2398,Petrol,1807331,18,male,3,0,9369,2,25,Comprehensive,urban
+0,Hatchback,2353,Petrol,2869800,36,other,29,2,25691,2,45,Own Damage Only,rural
+12,SUV,1614,Petrol,1071126,32,female,16,0,7462,2,0,Comprehensive,rural
+0,Compact,1212,CNG,4808249,34,female,16,2,16254,2,50,Own Damage Only,urban
+1,Hatchback,1873,Petrol,411334,35,male,26,0,5157,2,0,Comprehensive,rural
+5,Compact,2307,Diesel,4122622,39,male,40,2,7205,0,50,Own Damage Only,rural
+14,Hatchback,2069,Petrol,1610085,52,female,34,4,4403,1,50,Third Party,urban
+14,SUV,2285,Petrol,763543,29,female,8,2,7613,0,25,Comprehensive,urban
+4,Compact,3883,Diesel,1219264,62,male,23,3,23532,2,25,Comprehensive,urban
+8,Compact,2190,Electric,1878190,33,female,40,0,8956,1,25,Own Damage Only,rural
+12,Compact,1798,Petrol,1694307,59,female,22,0,27195,1,35,Third Party,rural
+0,Hatchback,870,Electric,3497706,35,male,1,3,3468,3,45,Own Damage Only,rural
+5,Compact,3588,CNG,2026743,24,female,42,4,26633,2,35,Comprehensive,urban
+12,SUV,1291,CNG,2927115,71,other,19,1,29594,3,35,Third Party,urban
+3,Hatchback,2467,Electric,2439928,31,female,6,2,26948,2,20,Third Party,rural
+13,SUV,2296,Diesel,1328339,68,female,11,4,4026,0,20,Comprehensive,rural
+1,SUV,3372,CNG,3750277,72,other,14,2,13790,0,0,Own Damage Only,rural
+6,Luxury,3852,Petrol,2717997,24,other,9,3,23693,3,50,Own Damage Only,urban
+3,Hatchback,2827,CNG,264713,28,male,12,3,25911,0,45,Third Party,urban
+3,Luxury,3498,Petrol,3409256,65,other,3,1,4972,3,25,Own Damage Only,rural
+0,Hatchback,2521,Diesel,2081461,59,female,1,2,8832,2,20,Third Party,urban
+1,Sedan,1120,Petrol,408242,41,other,32,1,17204,2,50,Own Damage Only,urban
+13,Compact,3273,Electric,4536911,36,female,10,3,14304,0,0,Own Damage Only,rural
+2,Sedan,3738,CNG,1675897,53,male,6,2,20605,0,45,Own Damage Only,rural
+13,Luxury,1064,CNG,1808570,69,female,19,3,4950,2,0,Comprehensive,rural
+2,Compact,3306,Petrol,4902698,66,female,5,2,23223,1,35,Third Party,rural
+13,Hatchback,3808,CNG,2759319,26,other,16,0,3993,2,35,Comprehensive,rural
+3,Luxury,1128,Petrol,1287295,74,male,37,1,11099,1,0,Own Damage Only,rural
+0,Sedan,1048,CNG,368573,61,female,33,2,12103,2,35,Third Party,urban
+13,Compact,3799,Diesel,3031433,43,male,38,2,20861,1,25,Own Damage Only,rural
+13,SUV,2005,Electric,1715114,52,male,31,0,13656,3,0,Own Damage Only,urban
+9,Sedan,1382,CNG,2482491,22,female,42,3,19497,1,45,Own Damage Only,rural
+11,Luxury,2034,Diesel,1091380,66,female,18,0,8647,0,45,Own Damage Only,urban
+2,Luxury,1850,Diesel,4527450,48,other,14,2,29283,1,35,Comprehensive,urban
+12,Hatchback,933,CNG,224393,56,male,6,1,27572,3,0,Third Party,urban
+10,Compact,933,Electric,2193784,64,female,7,4,5384,2,50,Comprehensive,urban
+0,SUV,1126,Electric,576645,60,female,34,3,16636,2,35,Own Damage Only,rural
+3,Hatchback,1951,CNG,2307158,58,female,5,4,13719,1,45,Third Party,rural
+9,Luxury,2695,Electric,4162404,47,other,20,2,16562,2,20,Comprehensive,rural
+4,Compact,3139,Petrol,1879718,23,other,42,0,13915,0,45,Own Damage Only,rural
+0,Compact,1873,CNG,789349,73,female,32,1,4853,0,25,Own Damage Only,urban
+7,Sedan,2850,Diesel,672938,44,female,11,1,18227,2,25,Comprehensive,urban
+9,Hatchback,2592,Petrol,525814,41,female,5,4,3096,0,35,Third Party,urban
+14,Sedan,3206,CNG,1296995,18,other,8,3,24517,0,0,Comprehensive,urban
+9,Sedan,3906,CNG,2694819,70,female,13,0,20799,0,0,Comprehensive,urban
+5,Luxury,895,CNG,1833917,68,male,10,2,24845,3,25,Third Party,rural
+11,SUV,1263,Diesel,3881801,50,other,12,1,27974,3,45,Comprehensive,urban

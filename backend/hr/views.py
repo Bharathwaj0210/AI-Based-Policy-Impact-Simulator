@@ -20,6 +20,41 @@ REQUIRED_FEATURES = [
     "isactive"
 ]
 
+def suggest_policy(df, score_col, user_filters=None):
+    if df.empty or score_col not in df.columns:
+        return None
+    user_filters = user_filters or {}
+    base_score = df[score_col].mean()
+    best_score = base_score
+    best_rule = None
+
+    for age in [18, 22, 25, 30]:
+        for rating in [2, 3, 4]:
+            for tenure in [0, 1, 3]:
+                temp = df[
+                    (df["age"] >= age) &
+                    (df["current employee rating"] >= rating) &
+                    (df["tenureyears"] >= tenure)
+                ]
+                if len(temp) < 10:
+                    continue
+                score = temp[score_col].mean()
+                if score < best_score - 0.01:
+                    best_score = score
+                    best_rule = {
+                        "Minimum Age": age,
+                        "Minimum Rating": rating,
+                        "Minimum Tenure": tenure
+                    }
+    user_rule = {
+        "Minimum Age": user_filters.get("age_min", 18),
+        "Minimum Rating": user_filters.get("rating_min", 1),
+        "Minimum Tenure": user_filters.get("tenure_min", 0)
+    }
+    if best_rule is None or best_rule == user_rule:
+        return None
+    return best_rule
+
 class HRUploadView(APIView):
     parser_classes = [MultiPartParser]
 
@@ -69,11 +104,14 @@ class HRUploadView(APIView):
                 Avg_Risk=(score_col, "mean")
             ).reset_index().to_dict('records')
             
+            recommendation = suggest_policy(df_sorted, score_col, {})
+            
             return Response({
                 "status": "success",
                 "data": json.loads(df_sorted.to_json(orient='records')),
                 "summary": summary_stats,
-                "score_col": score_col
+                "score_col": score_col,
+                "suggested_policy": recommendation
             })
         except Exception as e:
             return Response({"error": str(e)}, status=500)
@@ -99,54 +137,21 @@ class HRFilterView(APIView):
             (df["tenureyears"] >= tenure_min)
         ].copy()
         
-        # Recommendation Logic
-        def suggest_policy(df, score_col, user_filters):
-            if df.empty or score_col not in df.columns:
-                return None
-            base_score = df[score_col].mean()
-            best_score = base_score
-            best_rule = None
-
-            for age in [18, 22, 25, 30]:
-                for rating in [2, 3, 4]:
-                    for tenure in [0, 1, 3]:
-                        temp = df[
-                            (df["age"] >= age) &
-                            (df["current employee rating"] >= rating) &
-                            (df["tenureyears"] >= tenure)
-                        ]
-                        if len(temp) < 10:
-                            continue
-                        score = temp[score_col].mean()
-                        if score < best_score - 0.01:
-                            best_score = score
-                            best_rule = {
-                                "Minimum Age": age,
-                                "Minimum Rating": rating,
-                                "Minimum Tenure": tenure
-                            }
-            user_rule = {
-                "Minimum Age": user_filters.get("age_min"),
-                "Minimum Rating": user_filters.get("rating_min"),
-                "Minimum Tenure": user_filters.get("tenure_min")
-            }
-            if best_rule is None or best_rule == user_rule:
-                return None
-            return best_rule
-            
-        recommendation = suggest_policy(df, score_col, filters)
+        
+        recommendation = suggest_policy(filtered_df, score_col, filters)
         
         return Response({
             "status": "success",
             "eligible_count": len(filtered_df),
             "rejected_count": len(df) - len(filtered_df),
             "total_count": len(df),
-            "recommendation": recommendation if recommendation else "Current policy is already optimal."
+            "recommendation": recommendation
         })
 
 class HRExplainView(APIView):
     def post(self, request):
         data = request.data.get("data", [])
+        filters = request.data.get("filters", {})
         policy_option = request.data.get("policy_option", "Recruitment")
         
         if not data:
@@ -154,21 +159,65 @@ class HRExplainView(APIView):
             
         try:
             df = pd.DataFrame(data)
-            X = df[REQUIRED_FEATURES]
-            service = HRPredictionService(hr_type=policy_option.lower())
-            explainer = shap.TreeExplainer(service.model)
-            shap_values = explainer.shap_values(X)
             
-            if isinstance(shap_values, list):
-                shap_values = shap_values[1]
+            age_min = filters.get("age_min", 18)
+            rating_min = filters.get("rating_min", 1)
+            tenure_min = filters.get("tenure_min", 0)
+            
+            df_filtered = df[
+                (df["age"] >= age_min) &
+                (df["current employee rating"] >= rating_min) &
+                (df["tenureyears"] >= tenure_min)
+            ].copy()
+            
+            # Limit data for SHAP to ensure performance
+            df_shap = df_filtered.head(50)
+            X = df_shap[REQUIRED_FEATURES]
+            service = HRPredictionService(hr_type=policy_option.lower())
+            
+            pipeline = service.model
+            if hasattr(pipeline, "named_steps"):
+                preprocessor = pipeline.named_steps.get("preprocessor")
+                model = pipeline.named_steps.get("model")
+                if preprocessor:
+                    X_transformed = preprocessor.transform(X)
+                else:
+                    X_transformed = X
+            else:
+                model = pipeline
+                preprocessor = None
+                X_transformed = X
                 
-            shap_importance = np.abs(shap_values).mean(axis=0)
+            # Convert sparse to dense if necessary
+            if hasattr(X_transformed, "toarray"):
+                X_transformed = X_transformed.toarray()
+
+            explainer = shap.TreeExplainer(model)
+            shap_values = explainer.shap_values(X_transformed)
+            
+            # Handle binary classifier output (list or 3rd dimension)
+            if isinstance(shap_values, list):
+                sv = shap_values[1] if len(shap_values) > 1 else shap_values[0]
+            elif isinstance(shap_values, np.ndarray) and len(shap_values.shape) == 3:
+                sv = shap_values[:, :, 1] if shap_values.shape[2] > 1 else shap_values[:, :, 0]
+            else:
+                sv = shap_values
+                
+            if preprocessor:
+                feature_names = preprocessor.get_feature_names_out()
+            else:
+                feature_names = REQUIRED_FEATURES
+                
+            n_features = min(len(feature_names), sv.shape[1])
+            feature_names = feature_names[:n_features]
+            sv_slice = sv[:, :n_features]
+            
+            shap_importance = np.abs(sv_slice).mean(axis=0)
             
             shap_table = pd.DataFrame({
-                "Feature": REQUIRED_FEATURES,
-                "Mean_SHAP_Impact": shap_importance,
-                "Impact_%": 100 * shap_importance / shap_importance.sum()
-            }).sort_values("Impact_%", ascending=False).to_dict('records')
+                "feature": feature_names,
+                "importance": shap_importance
+            }).sort_values("importance", ascending=False).to_dict('records')
             
             return Response({
                 "status": "success",
@@ -182,27 +231,29 @@ class HRGeminiSummaryView(APIView):
         policy_option = request.data.get("policy_option", "Recruitment")
         scenario = request.data.get("scenario", "Average Case")
         summary_data = request.data.get("summary_data", {})
+        filters = request.data.get("filters", {})
+        metrics = request.data.get("metrics", {})
         
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
             return Response({"error": "GEMINI_API_KEY not found in environment"}, status=500)
             
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-flash-latest")
+        model = genai.GenerativeModel("gemini-1.5-flash")
         
         prompt = f"""
-        You are an HR analytics expert.
+You are an HR analytics expert analyzing the {scenario} scenario for the {policy_option} policy.
 
-        Explain the {scenario} scenario for {policy_option} policy.
+Current Policy Thresholds: {filters}
+Current Impact Metrics: {metrics}
+Dataset summary:
+{summary_data}
 
-        Dataset summary:
-        {summary_data}
-
-        Give 3 short bullet points:
-        - Risk interpretation
-        - HR implication
-        - Action suggestion
-        """
+Provide a concise explanation addressing ONLY these three points:
+1. Why the recommended policy rules are perfect for mitigating risks.
+2. The estimated workforce impact (how many employees will be affected/make use of it).
+3. How this specific rule type reduces false claims (e.g., unjustified attrition risk flags or poor recruitment fits).
+"""
         
         try:
             response = model.generate_content(prompt)

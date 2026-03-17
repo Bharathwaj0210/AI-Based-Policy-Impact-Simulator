@@ -57,6 +57,12 @@ class GovernmentUploadView(APIView):
             df = pd.read_csv(file)
             service = GovernmentPredictionService()
             
+            # Warn about missing columns based on policy rules
+            available_cols = list(df.columns)
+            conds = POLICY_CONDITIONS.get(policy, {})
+            required_for_policy = list(conds.keys())
+            missing = [c for c in required_for_policy if c not in available_cols]
+            
             df = service.normalize(df)
             df = service.apply_aliases(df)
             
@@ -86,7 +92,8 @@ class GovernmentUploadView(APIView):
                     "rule": best_rule,
                     "rate": best_rate
                 },
-                "available_cols": list(df.columns)
+                "missing_cols": missing,
+                "available_cols": available_cols
             })
         except Exception as e:
             return Response({"error": str(e)}, status=500)
@@ -95,7 +102,7 @@ class GovernmentFilterView(APIView):
     def post(self, request):
         data = request.data.get("data", [])
         policy = request.data.get("policy", "scholarship")
-        thresholds = request.data.get("thresholds", {})
+        filters = request.data.get("filters", {})
         
         if not data:
             return Response({"error": "No data provided"}, status=400)
@@ -103,12 +110,18 @@ class GovernmentFilterView(APIView):
         try:
             df_pred = pd.DataFrame(data)
             service = GovernmentPredictionService()
-            df_filtered = service.apply_policy_rules(df_pred, policy, thresholds)
+            df_filtered = service.apply_policy_rules(df_pred, policy, filters)
             
-            records = len(df_filtered)
-            eligible = int(df_filtered["eligible"].sum())
+            records = len(df_pred)
+            if "eligible" in df_filtered.columns:
+                eligible = int(df_filtered["eligible"].sum())
+            else:
+                eligible = len(df_filtered)
+                
             rejected = records - eligible
             rate = round(eligible / records, 4) if records > 0 else 0
+            
+            best_rule, best_rate = service.optimize_policy(df_pred, policy)
             
             return Response({
                 "status": "success",
@@ -118,6 +131,10 @@ class GovernmentFilterView(APIView):
                     "eligible": eligible,
                     "rejected": rejected,
                     "eligibility_rate": rate
+                },
+                "optimized_recommendation": {
+                    "rule": best_rule,
+                    "rate": best_rate
                 }
             })
         except Exception as e:
@@ -126,6 +143,7 @@ class GovernmentFilterView(APIView):
 class GovernmentExplainView(APIView):
     def post(self, request):
         data = request.data.get("data", [])
+        filters = request.data.get("filters", {})
         policy = request.data.get("policy", "scholarship")
         
         if not data:
@@ -134,21 +152,44 @@ class GovernmentExplainView(APIView):
         try:
             df = pd.DataFrame(data)
             service = GovernmentPredictionService()
-            X = prepare_model_input(df, policy, service.required_features)
+            
+            df_filtered = service.apply_policy_rules(df, policy, filters)
+            if len(df_filtered) == 0:
+                return Response({"status": "success", "shap_data": []})
+                
+            # Limit data for SHAP to ensure performance
+            df_shap = df_filtered.head(50)
+            X = prepare_model_input(df_shap, policy, service.required_features)
             
             pipeline = service.model
-            preprocessor = pipeline.named_steps.get("preprocessor")
-            model_only = pipeline.named_steps.get("model")
             
-            if not preprocessor or not model_only:
-                return Response({"error": "Model structure not compatible for SHAP"}, status=500)
+            if hasattr(pipeline, "named_steps"):
+                preprocessor = pipeline.named_steps.get("preprocessor")
+                model_only = pipeline.named_steps.get("model")
+                if not preprocessor or not model_only:
+                    return Response({"error": "Model structure not compatible for SHAP"}, status=500)
+                X_transformed = preprocessor.transform(X)
+                feature_names = preprocessor.get_feature_names_out()
+            else:
+                model_only = pipeline
+                X_transformed = X
+                feature_names = X.columns
+            
+            # Convert sparse to dense if necessary
+            if hasattr(X_transformed, "toarray"):
+                X_transformed = X_transformed.toarray()
                 
-            X_transformed = preprocessor.transform(X)
             explainer = shap.TreeExplainer(model_only)
             shap_values = explainer.shap_values(X_transformed)
-            sv = shap_values[1] if isinstance(shap_values, list) else shap_values
             
-            feature_names = preprocessor.get_feature_names_out()
+            # Handle binary classifier output (list or 3rd dimension)
+            if isinstance(shap_values, list):
+                sv = shap_values[1] if len(shap_values) > 1 else shap_values[0]
+            elif isinstance(shap_values, np.ndarray) and len(shap_values.shape) == 3:
+                sv = shap_values[:, :, 1] if shap_values.shape[2] > 1 else shap_values[:, :, 0]
+            else:
+                sv = shap_values
+            
             n_features = min(len(feature_names), sv.shape[1])
             feature_names = feature_names[:n_features]
             sv_slice = sv[:, :n_features]
@@ -156,10 +197,9 @@ class GovernmentExplainView(APIView):
             shap_importance = np.abs(sv_slice).mean(axis=0)
             
             shap_table = pd.DataFrame({
-                "Feature": feature_names,
-                "Mean_SHAP_Impact": shap_importance,
-                "Impact_%": 100 * shap_importance / shap_importance.sum()
-            }).sort_values("Impact_%", ascending=False).to_dict('records')
+                "feature": feature_names,
+                "importance": shap_importance
+            }).sort_values("importance", ascending=False).to_dict('records')
             
             return Response({
                 "status": "success",
@@ -171,19 +211,27 @@ class GovernmentExplainView(APIView):
 class GovernmentGeminiSummaryView(APIView):
     def post(self, request):
         policy = request.data.get("policy", "scholarship")
+        metrics = request.data.get("metrics", {})
+        filters = request.data.get("filters", {})
         api_key = os.getenv("GEMINI_API_KEY")
         
         if not api_key:
             return Response({"error": "GEMINI_API_KEY not found in environment"}, status=500)
             
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-flash-latest")
+        model = genai.GenerativeModel("gemini-1.5-flash")
         
         prompt = f"""
-        Risk scores and eligibility are generated by trained machine learning models for the {policy} government policy.
-        Policy conditions and rules act as filters on top of these model predictions to ensure citizens meet thresholds.
-        Please provide a short business-friendly explanation summarizing this AI-driven eligibility process.
-        """
+You are an expert policy advisor analyzing {policy} policy data.
+
+Current Policy Thresholds: {filters}
+Current Impact Metrics: {metrics}
+
+Provide a concise explanation (strictly addressing these three points):
+1. Why the recommended policy threshold is optimal.
+2. The estimated demographic reach (how many citizens will utilize it based on current metrics).
+3. How this specific rule mitigates the risk of false claims or improper allocations.
+"""
         
         try:
             response = model.generate_content(prompt)

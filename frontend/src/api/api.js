@@ -1,12 +1,31 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE = 'http://127.0.0.1:8000/api';
 
-const api = axios.create({
-    baseURL: API_BASE_URL,
-});
+export const uploadDataset = async (domain, file, extraData = {}) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    Object.keys(extraData).forEach(key => formData.append(key, extraData[key]));
 
-export const getInsurancePolicies = () => api.get('/insurance/policies/');
-export const getGovernmentPolicies = () => api.get('/government/policies/');
+    const response = await axios.post(`${API_BASE}/${domain}/upload/`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+};
 
-export default api;
+export const filterDataset = async (domain, data, filters, extraData = {}) => {
+    const payload = { data, filters, ...extraData };
+    const response = await axios.post(`${API_BASE}/${domain}/filter/`, payload);
+    return response.data;
+};
+
+export const explainModel = async (domain, data, filters, extraData = {}) => {
+    const payload = { data, filters, ...extraData };
+    const response = await axios.post(`${API_BASE}/${domain}/explain/`, payload);
+    return response.data;
+};
+
+export const getGeminiSummary = async (domain, extraData = {}) => {
+    const response = await axios.post(`${API_BASE}/${domain}/gemini-summary/`, extraData);
+    return response.data;
+};

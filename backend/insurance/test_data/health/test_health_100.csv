@@ -1,0 +1,101 @@
+age,sex,bmi,smoker,income,pre_existing_conditions,hospital_visits_last_year,claim_frequency,location_risk_score
+77,male,36.4,yes,1901243,Heart Disease,2,1,10
+47,male,42.2,no,1483214,Diabetes,1,1,8
+26,male,27.9,yes,360090,Heart Disease,7,0,9
+79,male,33.6,yes,1901951,Hypertension,2,1,7
+44,male,24.4,yes,1398182,None,5,0,4
+54,female,42.4,yes,764825,None,2,2,8
+24,female,29.0,no,1530378,Diabetes,4,0,2
+47,female,31.6,yes,1453889,Diabetes,7,3,9
+27,female,43.8,no,51512,Diabetes,4,1,3
+31,male,39.0,no,1242021,Heart Disease,7,3,7
+25,male,35.2,no,947253,None,6,3,1
+30,female,37.1,no,1225707,Diabetes,0,2,10
+72,female,24.7,no,519551,Heart Disease,2,2,9
+36,female,26.8,yes,230387,Diabetes,4,2,2
+21,female,22.6,yes,242967,Hypertension,1,3,5
+83,female,24.9,yes,1928503,Heart Disease,2,1,4
+48,male,22.3,no,1712699,Diabetes,2,0,8
+41,male,39.3,yes,648656,Heart Disease,0,2,4
+80,female,18.2,no,1919066,Heart Disease,7,0,9
+74,male,22.9,yes,83850,Heart Disease,1,2,1
+28,male,22.0,no,102076,None,4,3,9
+24,male,20.1,no,443144,None,0,1,5
+70,male,37.4,no,496601,Hypertension,1,2,6
+79,male,22.5,yes,1416929,None,5,2,10
+75,female,33.6,yes,501726,Heart Disease,1,3,8
+39,female,30.6,yes,1794242,Asthma,5,0,2
+26,male,24.1,yes,920486,Asthma,0,2,9
+56,female,20.3,no,1628490,Heart Disease,5,3,10
+20,female,40.7,no,246962,Heart Disease,4,0,3
+78,male,41.4,yes,474215,None,5,2,6
+79,male,30.4,yes,1495538,Heart Disease,5,0,5
+61,female,39.6,no,516757,Hypertension,0,3,6
+72,male,32.0,yes,429214,Asthma,1,3,6
+76,male,37.1,no,552632,Heart Disease,3,2,6
+51,male,23.7,no,53777,Asthma,5,3,4
+22,male,35.8,yes,1569755,Hypertension,7,1,10
+82,female,29.6,no,435289,Asthma,3,0,10
+22,male,18.7,no,1816804,None,6,2,2
+53,female,41.3,yes,117268,Asthma,2,3,1
+29,female,19.3,no,1939809,Hypertension,0,2,8
+57,female,31.6,no,180740,Heart Disease,1,1,2
+34,female,24.1,no,409477,None,4,0,10
+54,female,21.4,no,1321728,None,1,0,7
+21,male,38.8,no,112679,Hypertension,0,1,1
+75,male,39.0,no,1175088,Asthma,2,2,10
+41,male,42.2,no,61811,Diabetes,5,1,9
+18,female,28.8,no,1002238,Hypertension,5,2,5
+80,male,28.5,yes,814160,Asthma,2,0,6
+20,male,21.2,yes,1276495,Heart Disease,2,0,4
+76,male,34.3,no,1215241,Diabetes,0,2,7
+80,male,44.4,no,64873,Heart Disease,1,0,8
+78,male,44.0,yes,141976,None,7,3,3
+74,male,28.5,yes,1762979,Asthma,0,2,5
+31,female,40.1,no,941965,Heart Disease,5,1,5
+18,female,43.0,yes,1806638,Asthma,3,0,4
+49,male,41.6,yes,558667,Hypertension,3,2,7
+84,female,20.2,no,1415444,Diabetes,7,0,7
+40,male,32.1,yes,1716571,None,2,1,1
+23,male,17.0,no,353654,Diabetes,1,1,5
+61,male,36.0,yes,136806,Heart Disease,0,0,1
+71,female,21.8,yes,164775,Hypertension,3,1,7
+72,female,21.1,yes,1654087,Heart Disease,1,0,10
+42,female,42.9,yes,1310703,Diabetes,0,3,10
+20,male,25.1,yes,309192,Asthma,3,0,9
+75,female,43.0,no,1623213,Asthma,0,1,10
+63,female,23.6,no,59793,Hypertension,6,2,2
+43,male,20.6,no,258434,Hypertension,1,3,7
+20,female,29.2,no,704640,None,0,2,7
+34,female,30.4,no,771361,Heart Disease,5,2,8
+80,male,20.1,yes,579036,Diabetes,5,1,10
+34,female,15.1,yes,1506149,Hypertension,2,3,5
+46,male,37.9,yes,1472541,Heart Disease,7,2,8
+47,male,17.5,yes,525039,Heart Disease,2,0,8
+60,male,24.0,yes,810103,Heart Disease,0,2,4
+82,female,26.7,no,120538,Hypertension,0,0,9
+32,male,17.9,no,626444,Asthma,6,2,10
+41,male,28.4,yes,1993257,Diabetes,6,3,3
+81,female,36.4,yes,1351949,Diabetes,1,1,7
+72,female,33.9,no,975788,None,6,3,7
+47,female,33.2,no,56580,Asthma,5,3,9
+67,female,15.6,yes,488075,Diabetes,3,3,8
+30,female,23.9,no,1031914,Heart Disease,4,2,8
+34,female,25.4,yes,1209572,Hypertension,3,1,5
+80,male,35.3,no,395904,Asthma,6,0,3
+50,male,39.5,no,230787,Asthma,5,1,7
+47,female,39.5,yes,440202,Heart Disease,6,0,9
+57,male,34.6,yes,1486022,Heart Disease,4,3,9
+46,female,36.8,no,222026,Hypertension,5,3,2
+51,female,21.0,no,1205127,Heart Disease,3,0,8
+40,female,37.1,yes,1694172,Hypertension,2,3,2
+23,male,37.4,no,1529292,Heart Disease,7,1,5
+18,female,32.3,no,1187634,Heart Disease,2,1,1
+62,female,24.4,no,1001363,Heart Disease,1,2,2
+33,female,30.2,no,1249361,None,2,0,7
+20,male,28.5,no,1274786,Hypertension,0,2,6
+27,male,20.2,no,1626354,Asthma,2,3,7
+25,male,37.2,yes,1688313,None,1,0,2
+73,female,31.4,yes,440292,Diabetes,0,2,2
+76,female,42.5,no,1231642,Diabetes,6,1,9
+19,male,39.6,no,1824110,None,1,0,5

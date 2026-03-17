@@ -41,22 +41,41 @@ class GovernmentPredictionService(BasePredictionService):
             aliases_filename="column_aliases.pkl"
         )
 
-    def apply_policy_rules(self, df_pred, policy, thresholds):
+    def apply_aliases(self, df: pd.DataFrame) -> pd.DataFrame:
+        df = df.copy()
+        for canonical, variants in self.aliases.items():
+            if not isinstance(variants, list):
+                variants = [variants]
+            for v in variants:
+                if isinstance(v, str):
+                    v_lower = v.lower().strip()
+                    if v_lower in df.columns and canonical not in df.columns:
+                        df.rename(columns={v_lower: canonical}, inplace=True)
+        return df
+
+    def apply_policy_rules(self, df_pred, policy, filters):
         mask = pd.Series(True, index=df_pred.index)
         conds = POLICY_CONDITIONS.get(policy, {})
         for col, config in conds.items():
             if col not in df_pred.columns: continue
             cfg_type = config["type"]
-            val = thresholds.get(col)
+            val = filters.get(col)
             if val is None: continue
-            if cfg_type == "max": mask &= pd.to_numeric(df_pred[col], errors="coerce") <= val
-            elif cfg_type == "min": mask &= pd.to_numeric(df_pred[col], errors="coerce") >= val
+            if cfg_type == "max": mask &= pd.to_numeric(df_pred[col], errors="coerce") <= float(val)
+            elif cfg_type == "min": mask &= pd.to_numeric(df_pred[col], errors="coerce") >= float(val)
             elif cfg_type == "multiselect": mask &= df_pred[col].astype(str).str.lower().isin([str(v).lower() for v in val])
             elif cfg_type == "multiselect_optional" and val: mask &= df_pred[col].astype(str).str.lower().isin([str(v).lower() for v in val])
             elif cfg_type == "disability_filter":
                 if val == "Disabled only": mask &= (pd.to_numeric(df_pred[col], errors="coerce").fillna(0).astype(int) == 1)
                 elif val == "Non-disabled only": mask &= (pd.to_numeric(df_pred[col], errors="coerce").fillna(0).astype(int) == 0)
-            elif cfg_type == "binary" and val: mask &= (pd.to_numeric(df_pred[col], errors="coerce").fillna(1) == 0)
+            elif cfg_type == "binary":
+                if isinstance(val, bool):
+                    target = 0 if val else 1 # Must NOT own house -> val=True means filter for 0
+                    mask &= (pd.to_numeric(df_pred[col], errors="coerce").fillna(1).astype(int) == target)
+                else: 
+                    # If passed as string "Yes"/"No"
+                    mask &= df_pred[col].astype(str).str.lower().isin(["no", "false", "0"])
+
         return df_pred[mask]
 
     def optimize_policy(self, df_pred, policy):
@@ -79,5 +98,24 @@ class GovernmentPredictionService(BasePredictionService):
                     if len(temp) < 10: continue
                     rate = temp["eligible"].mean()
                     if rate > best_rate: best_rate, best_rule = rate, {"age": age, "annual_income": inc}
-        # Simplified for brevity as per user request (minimal code)
+        elif policy == "housing":
+            incs = [200000, 300000, 400000] if "annual_income" in available_cols else [None]
+            f_sizes = [2, 3, 4] if "family_size" in available_cols else [None]
+            for inc in incs:
+                for fs in f_sizes:
+                    temp = df_pred.copy()
+                    if inc: temp = temp[temp["annual_income"] <= inc]
+                    if fs: temp = temp[temp["family_size"] >= fs]
+                    if len(temp) < 10: continue
+                    rate = temp["eligible"].mean()
+                    if rate > best_rate: best_rate, best_rule = rate, {"annual_income": inc, "family_size": fs}
+        elif policy == "cash_welfare":
+            # Heuristic for cash welfare
+            incs = [100000, 150000, 200000] if "annual_income" in available_cols else [None]
+            for inc in incs:
+                temp = df_pred[df_pred["annual_income"] <= inc] if inc else df_pred
+                if len(temp) < 10: continue
+                rate = temp["eligible"].mean()
+                if rate > best_rate: best_rate, best_rule = rate, {"annual_income": inc}
+        
         return best_rule, round(best_rate, 4) if best_rate >= 0 else 0
