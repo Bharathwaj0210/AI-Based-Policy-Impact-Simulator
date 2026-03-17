@@ -40,7 +40,11 @@ class BasePredictionService(ABC):
 
     def _load_artifacts(self):
         self.model = joblib.load(self.model_path)
-        self.required_features = joblib.load(self.features_path)
+        self.original_features = joblib.load(self.features_path)
+        # We still need normalized versions for alignment logic
+        self.required_features = [f.lower().strip().replace(" ", "_") for f in self.original_features]
+        # Create a mapping from normalized -> original
+        self.feature_map = dict(zip(self.required_features, self.original_features))
         self.aliases = joblib.load(self.aliases_path) if self.aliases_path and os.path.exists(self.aliases_path) else {}
 
     def normalize(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -67,12 +71,32 @@ class BasePredictionService(ABC):
         missing_features = []
         for col in self.required_features:
             if col not in df.columns:
+                # If column is missing, we try to guess a safe default
+                # This helps prevent Pipeline crashes
                 df[col] = np.nan
                 missing_features.append(col)
         
-        X = df[self.required_features]
-        # Basic imputation if not handled by pipeline
-        X = X.fillna(0) # Or X.fillna(X.median()) for more robustness if app-specific
+        X = df[self.required_features].copy()
+        
+        # Robustly handle types feature by feature
+        for col in X.columns:
+            # If already numeric, just fill
+            if pd.api.types.is_numeric_dtype(X[col]):
+                X[col] = X[col].fillna(0)
+            else:
+                # Try numeric conversion
+                numeric_series = pd.to_numeric(X[col], errors='coerce')
+                # If mostly numeric, keep as numeric
+                if numeric_series.notna().sum() > (len(X[col]) / 2):
+                    X[col] = numeric_series.fillna(0)
+                else:
+                    # Strictly categorical strings
+                    # Ensure no np.nan remains; use apply(str) or map
+                    X[col] = X[col].apply(lambda v: str(v) if pd.notna(v) and str(v).lower() != 'nan' else 'Unknown')
+        
+        # IMPORTANT: Rename back to original casing for scikit-learn exact match
+        X = X.rename(columns=self.feature_map)
+        
         return X, missing_features
 
     def predict(self, data):

@@ -35,7 +35,14 @@ const Insurance = () => {
             if (insuranceType === 'Health Insurance') {
                 setFilters({ max_age: 60, max_bmi: 35.0, allow_smoker: 'Yes' });
             } else {
-                setFilters({ max_vehicle_age: 10, max_accidents: 2 });
+                setFilters({ 
+                    max_vehicle_age: 15, 
+                    min_experience: 2, 
+                    max_customer_age: 70,
+                    max_value_vehicle: 50000,
+                    max_cylinder_capacity: 2500,
+                    max_premium: 1000
+                });
             }
         } catch (error) {
             console.error("Upload failed", error);
@@ -207,28 +214,79 @@ const Insurance = () => {
                                         </>
                                     ) : (
                                         <>
-                                            <Form.Group className="mb-3">
-                                                <Form.Label className="d-flex justify-content-between small fw-bold">
-                                                    <span>Max Vehicle Age</span>
-                                                    <span className="text-primary">{filters.max_vehicle_age !== undefined ? filters.max_vehicle_age : 10}</span>
-                                                </Form.Label>
-                                                <Form.Range
-                                                    min={0} max={25} step={1}
-                                                    value={filters.max_vehicle_age !== undefined ? filters.max_vehicle_age : 10}
-                                                    onChange={(e) => handleFilterChange('max_vehicle_age', e.target.value)}
-                                                />
-                                            </Form.Group>
-                                            <Form.Group className="mb-3">
-                                                <Form.Label className="d-flex justify-content-between small fw-bold">
-                                                    <span>Max Accident History</span>
-                                                    <span className="text-primary">{filters.max_accidents !== undefined ? filters.max_accidents : 2}</span>
-                                                </Form.Label>
-                                                <Form.Range
-                                                    min={0} max={10} step={1}
-                                                    value={filters.max_accidents !== undefined ? filters.max_accidents : 2}
-                                                    onChange={(e) => handleFilterChange('max_accidents', e.target.value)}
-                                                />
-                                            </Form.Group>
+                                            <div className="mb-3 p-2 bg-light rounded border-start border-primary border-4">
+                                                <small className="text-primary fw-bold d-block mb-2 text-uppercase">Necessary Conditions</small>
+                                                <Form.Group className="mb-2">
+                                                    <Form.Label className="d-flex justify-content-between small fw-bold">
+                                                        <span>Max Vehicle Age</span>
+                                                        <span className="text-primary">{filters.max_vehicle_age !== undefined ? filters.max_vehicle_age : 15}</span>
+                                                    </Form.Label>
+                                                    <Form.Range
+                                                        min={0} max={30} step={1}
+                                                        value={filters.max_vehicle_age !== undefined ? filters.max_vehicle_age : 15}
+                                                        onChange={(e) => handleFilterChange('max_vehicle_age', e.target.value)}
+                                                    />
+                                                </Form.Group>
+                                                <Form.Group className="mb-2">
+                                                    <Form.Label className="d-flex justify-content-between small fw-bold">
+                                                        <span>Min Experience (Yrs)</span>
+                                                        <span className="text-primary">{filters.min_experience !== undefined ? filters.min_experience : 2}</span>
+                                                    </Form.Label>
+                                                    <Form.Range
+                                                        min={0} max={50} step={1}
+                                                        value={filters.min_experience !== undefined ? filters.min_experience : 2}
+                                                        onChange={(e) => handleFilterChange('min_experience', e.target.value)}
+                                                    />
+                                                </Form.Group>
+                                                <Form.Group className="mb-2">
+                                                    <Form.Label className="d-flex justify-content-between small fw-bold">
+                                                        <span>Max Customer Age</span>
+                                                        <span className="text-primary">{filters.max_customer_age !== undefined ? filters.max_customer_age : 70}</span>
+                                                    </Form.Label>
+                                                    <Form.Range
+                                                        min={18} max={100} step={1}
+                                                        value={filters.max_customer_age !== undefined ? filters.max_customer_age : 70}
+                                                        onChange={(e) => handleFilterChange('max_customer_age', e.target.value)}
+                                                    />
+                                                </Form.Group>
+                                            </div>
+
+                                            <div className="mb-3 p-2 bg-light rounded border-start border-warning border-4">
+                                                <small className="text-warning fw-bold d-block mb-2 text-uppercase">Balance Conditions (Optional)</small>
+                                                <Form.Group className="mb-2">
+                                                    <Form.Label className="d-flex justify-content-between small fw-bold">
+                                                        <span>Max Vehicle Value ($)</span>
+                                                        <span className="text-warning">{filters.max_value_vehicle || 50000}</span>
+                                                    </Form.Label>
+                                                    <Form.Range
+                                                        min={1000} max={100000} step={500}
+                                                        value={filters.max_value_vehicle || 50000}
+                                                        onChange={(e) => handleFilterChange('max_value_vehicle', e.target.value)}
+                                                    />
+                                                </Form.Group>
+                                                <Form.Group className="mb-2">
+                                                    <Form.Label className="d-flex justify-content-between small fw-bold">
+                                                        <span>Max Cylinder Capacity</span>
+                                                        <span className="text-warning">{filters.max_cylinder_capacity || 2500}</span>
+                                                    </Form.Label>
+                                                    <Form.Range
+                                                        min={500} max={6000} step={100}
+                                                        value={filters.max_cylinder_capacity || 2500}
+                                                        onChange={(e) => handleFilterChange('max_cylinder_capacity', e.target.value)}
+                                                    />
+                                                </Form.Group>
+                                                <Form.Group className="mb-2">
+                                                    <Form.Label className="d-flex justify-content-between small fw-bold">
+                                                        <span>Max Premium ($)</span>
+                                                        <span className="text-warning">{filters.max_premium || 1000}</span>
+                                                    </Form.Label>
+                                                    <Form.Range
+                                                        min={100} max={5000} step={50}
+                                                        value={filters.max_premium || 1000}
+                                                        onChange={(e) => handleFilterChange('max_premium', e.target.value)}
+                                                    />
+                                                </Form.Group>
+                                            </div>
                                         </>
                                     )}
 

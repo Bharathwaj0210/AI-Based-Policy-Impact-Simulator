@@ -1,0 +1,13 @@
+Best Threshold: 0.5200
+Accuracy: 0.8798
+ROC-AUC: 0.9447
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.96      0.89      0.92     17182
+           1       0.63      0.85      0.72      3929
+
+    accuracy                           0.88     21111
+   macro avg       0.80      0.87      0.82     21111
+weighted avg       0.90      0.88      0.89     21111

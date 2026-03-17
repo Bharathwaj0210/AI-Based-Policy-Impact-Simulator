@@ -238,8 +238,15 @@ class HRGeminiSummaryView(APIView):
         if not api_key:
             return Response({"error": "GEMINI_API_KEY not found in environment"}, status=500)
             
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        try:
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            model.generate_content("test")
+        except Exception as e1:
+            try:
+                model = genai.GenerativeModel("gemini-pro")
+                model.generate_content("test")
+            except Exception as e2:
+                return Response({"error": f"Gemini Error (1.5-flash): {str(e1)} | (Pro): {str(e2)}"}, status=500)
         
         prompt = f"""
 You are an HR analytics expert analyzing the {scenario} scenario for the {policy_option} policy.
