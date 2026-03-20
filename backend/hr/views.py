@@ -51,7 +51,7 @@ def suggest_policy(df, score_col, user_filters=None):
         "Minimum Rating": user_filters.get("rating_min", 1),
         "Minimum Tenure": user_filters.get("tenure_min", 0)
     }
-    if best_rule is None or best_rule == user_rule:
+    if best_rule is None:
         return None
     return best_rule
 
@@ -138,7 +138,7 @@ class HRFilterView(APIView):
         ].copy()
         
         
-        recommendation = suggest_policy(filtered_df, score_col, filters)
+        recommendation = suggest_policy(df, score_col, filters)
         
         return Response({
             "status": "success",
@@ -243,29 +243,56 @@ class HRGeminiSummaryView(APIView):
             model = genai.GenerativeModel("gemini-2.5-flash")
             
             prompt = f"""
-You are an HR analytics expert analyzing the {scenario} scenario for the {policy_option} policy.
+You are an HR analytics expert analyzing scenarios for the {policy_option} policy.
 
 Current Policy Thresholds: {filters}
 Current Impact Metrics: {metrics}
 Dataset summary: {summary_data}
 
-Provide a clear, easy-to-understand explanation of the optimized rule suggested by the ML model.
-Structure your response into the following three scenarios:
-- **Best Case Scenario**: Explain how this rule performs for clearly ideal employees or fits.
-- **Average Case Scenario**: Explain the expected performance for typical, moderate-fit applicants.
-- **Worst Case Scenario**: Explain how this rule protects the organization from high-risk or outlier cases (e.g., poor cultural fit or low retention risk).
-
-Then, briefly summarize:
-1. The estimated workforce impact and applicant reach.
-2. How this reduces overall risk (e.g., unjustified attrition risk flags).
-
-Keep the language simple and avoid technical jargon. Use bolding and bullet points for readability.
+INSTRUCTIONS:
+Provide a detailed and granular comparison of three performance scenarios: Best Case, Average Case, and Worst Case.
+You MUST return the data in a strict JSON format with the following structure:
+{{
+  "scenarios": [
+    {{
+      "scenario": "Best Case",
+      "strategic_focus": "Short focus point (10-15 words)",
+      "client_impact": "Short impact point (10-15 words)",
+      "risk_control": "Short control point (10-15 words)"
+    }},
+    {{
+      "scenario": "Average Case",
+      "strategic_focus": "...",
+      "client_impact": "...",
+      "risk_control": "..."
+    }},
+    {{
+      "scenario": "Worst Case",
+      "strategic_focus": "...",
+      "client_impact": "...",
+      "risk_control": "..."
+    }}
+  ],
+  "overall_summary": "A concise 2-sentence summary of the policy's estimated workforce impact and risk reduction mechanism."
+}}
 """
-            response = model.generate_content(prompt)
-            return Response({
-                "status": "success",
-                "explanation": response.text
-            })
+            response = model.generate_content(
+                prompt,
+                generation_config={"response_mime_type": "application/json"}
+            )
+            try:
+                result = json.loads(response.text)
+                return Response({
+                    "status": "success",
+                    "scenarios": result.get("scenarios", []),
+                    "overall_summary": result.get("overall_summary", "")
+                })
+            except Exception as json_err:
+                print(f"JSON Parse Error in HR Gemini: {json_err}")
+                return Response({
+                    "status": "success",
+                    "explanation": response.text  # Fallback
+                })
         except Exception as e:
             import traceback
             print("ERROR IN HRGeminiSummaryView:")

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { uploadDataset, filterDataset, explainModel, getGeminiSummary } from '../api/api';
-import { Form, Button, Row, Col, Card, Spinner, Table, ProgressBar } from 'react-bootstrap';
+import { Form, Button, Row, Col, Card, Spinner, Table } from 'react-bootstrap';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { FaUpload, FaRobot, FaFilter, FaChartBar, FaUserTie } from 'react-icons/fa';
+import { FaUpload, FaRobot, FaFilter, FaChartBar, FaUserTie, FaDownload, FaChartLine } from 'react-icons/fa';
+import { generatePolicyReport } from '../utils/reportGenerator';
 
 const HR = () => {
     const [file, setFile] = useState(null);
@@ -12,26 +13,23 @@ const HR = () => {
     // State
     const [data, setData] = useState([]);
     const [metrics, setMetrics] = useState(null);
-    const [summaryStats, setSummaryStats] = useState([]);
     const [shapData, setShapData] = useState([]);
-    const [geminiSummary, setGeminiSummary] = useState('');
+    const [geminiData, setGeminiData] = useState(null);
     const [suggestedPolicy, setSuggestedPolicy] = useState(null);
-    const [scenario, setScenario] = useState('Average Case');
 
     // Filters state
     const [filters, setFilters] = useState({});
 
     const handleUpload = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
         if (!file) return;
         setLoading(true);
         try {
             const res = await uploadDataset('hr', file, { analysis_type: hrType });
             setData(res.data);
             setMetrics(res.overall_metrics);
-            setSummaryStats(res.summary);
             setSuggestedPolicy(res.suggested_policy || res.recommendation);
-            // Default filters based on summary stats
+            // Default filters
             setFilters({ age_min: 18, rating_min: 1, tenure_min: 0 });
         } catch (error) {
             console.error("Upload failed", error);
@@ -56,242 +54,265 @@ const HR = () => {
             setMetrics(newMetrics);
             setSuggestedPolicy(res.recommendation);
 
-            // Auto fetch SHAP
-            explainModel('hr', data, filters, { analysis_type: hrType })
-                .then(shapRes => setShapData(shapRes.shap_data))
-                .catch(err => console.error(err));
-
-            // Auto fetch Gemini
-            fetchSummary(filters, newMetrics);
+            // Auto fetch SHAP & Gemini
+            const [shapRes, geminiRes] = await Promise.all([
+                explainModel('hr', data, filters, { analysis_type: hrType }),
+                getGeminiSummary('hr', { analysis_type: hrType, filters, metrics: newMetrics })
+            ]);
+            setShapData(shapRes.shap_data);
+            setGeminiData(geminiRes);
         } catch (error) {
-            console.error("Filter failed", error);
-        }
-        setLoading(false);
-    };
-
-    const fetchExplanation = async () => {
-        setLoading(true);
-        try {
-            const res = await explainModel('hr', data, filters, { analysis_type: hrType });
-            setShapData(res.shap_data);
-        } catch (error) {
-            console.error("Explain failed", error);
-        }
-        setLoading(false);
-    };
-
-    const fetchSummary = async (currentFilters = filters, currentMetrics = metrics) => {
-        setLoading(true);
-        try {
-            // Compute mean of displayed subset for Gemini
-            const summary_data = {};
-            if (data.length > 0) {
-                const caseData = data.filter(d => d.case_type === scenario);
-                if (caseData.length > 0) {
-                    ['age', 'tenureyears', 'performance score', 'current employee rating', 'isactive'].forEach(f => {
-                        const sum = caseData.reduce((acc, val) => acc + (parseFloat(val[f]) || 0), 0);
-                        summary_data[f] = (sum / caseData.length).toFixed(2);
-                    });
-                }
-            }
-            const res = await getGeminiSummary('hr', { 
-                analysis_type: hrType, 
-                scenario: scenario, 
-                summary_data: summary_data,
-                filters: currentFilters,
-                metrics: currentMetrics
-            });
-            setGeminiSummary(res.explanation);
-        } catch (error) {
-            console.error("Summary failed", error);
+            console.error("Simulation failed", error);
         }
         setLoading(false);
     };
 
     return (
-        <div className="hr-dashboard fade-in">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2><FaUserTie className="text-warning me-2" /> HR Domain Simulator</h2>
-                <Form.Select style={{ width: '250px' }} value={hrType} onChange={e => setHrType(e.target.value)}>
-                    <option value="Recruitment Optimization">Recruitment Optimization</option>
-                    <option value="Attrition Prediction">Attrition Prediction</option>
-                </Form.Select>
+        <div className="hr-container fade-in">
+            {/* Domain Hero */}
+            <div className="domain-hero">
+                <img src="/assets/hr.png" alt="HR Domain" className="domain-hero-img" />
+                <div className="domain-hero-content">
+                    <h2 className="fw-bold text-primary mb-1">HR Operations Simulator</h2>
+                    <p className="text-muted mb-0">Optimize talent acquisition and employee retention with explainable AI.</p>
+                </div>
             </div>
 
-            {/* Upload Section */}
-            {!data.length && (
-                <Card className="glass-card mb-4 text-center p-5">
-                    <Card.Body>
-                        <FaUpload size={40} className="text-primary mb-3" />
-                        <h4>Upload HR Dataset</h4>
-                        <p className="text-muted">Upload employee or candidate records to simulate optimized HR policies.</p>
-                        <Form onSubmit={handleUpload} className="d-flex justify-content-center">
-                            <Form.Control type="file" onChange={e => setFile(e.target.files[0])} style={{ maxWidth: '300px' }} className="me-2" />
-                            <Button type="submit" variant="primary" disabled={loading || !file}>
-                                {loading ? <Spinner animation="border" size="sm" /> : 'Run Analysis'}
-                            </Button>
-                        </Form>
-                    </Card.Body>
-                </Card>
-            )}
+            <Row>
+                {/* Left Sidebar: Filters */}
+                <Col lg={4} className="mb-4">
+                    <div className="filter-panel">
+                        {/* Mode Switcher */}
+                        <Card className="simulator-card shadow-sm border-0 mb-4 bg-light">
+                            <Card.Body className="p-3">
+                                <Form.Group>
+                                    <Form.Label className="small fw-bold text-muted mb-2">Analysis Objective</Form.Label>
+                                    <Form.Select 
+                                        size="sm" 
+                                        value={hrType} 
+                                        onChange={(e) => {
+                                            setHrType(e.target.value);
+                                            setData([]);
+                                            setMetrics(null);
+                                        }}
+                                        className="rounded-pill border-0 shadow-sm"
+                                    >
+                                        <option value="Recruitment Optimization">🎯 Recruitment Optimization</option>
+                                        <option value="Attrition Prediction">🧠 Attrition Prediction</option>
+                                    </Form.Select>
+                                </Form.Group>
+                            </Card.Body>
+                        </Card>
 
-            {/* Main Interactive Dashboard */}
-            {data.length > 0 && (
-                <>
-                    {/* Top Metrics Cards */}
-                    {metrics && (
-                        <Row className="mb-4">
-                            <Col md={4}>
-                                <Card className="glass-card text-center border-left-primary">
-                                    <Card.Body>
-                                        <h6 className="text-muted text-uppercase">Total Persons Evaluated</h6>
-                                        <h2 className="mb-0">{metrics.records_evaluated || metrics.total_records}</h2>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                            <Col md={4}>
-                                <Card className="glass-card text-center border-left-success">
-                                    <Card.Body>
-                                        <h6 className="text-muted text-uppercase">Eligible Total</h6>
-                                        <h2 className="text-success mb-0">{metrics.eligible || metrics.best_case}</h2>
-                                        <small className="text-muted">{((metrics.eligibility_rate || 0) * 100).toFixed(1)}% of total</small>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                            <Col md={4}>
-                                <Card className="glass-card text-center border-left-danger">
-                                    <Card.Body>
-                                        <h6 className="text-muted text-uppercase">Total Rejection</h6>
-                                        <h2 className="text-danger mb-0">{metrics.rejected || metrics.worst_case}</h2>
-                                        <small className="text-muted">{((1 - (metrics.eligibility_rate || 0)) * 100).toFixed(1)}% of total</small>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                        </Row>
-                    )}
+                        {/* File Upload */}
+                        {!data.length && (
+                            <Card className="simulator-card shadow-sm border-0 mb-4">
+                                <Card.Body className="p-4 text-center">
+                                    <FaUpload size={40} className="text-primary opacity-25 mb-3" />
+                                    <h6 className="fw-bold">Step 1: Upload Dataset</h6>
+                                    <p className="small text-muted mb-3">Load your HR or candidate CSV to begin strategic modeling.</p>
+                                    <Form.Group className="mb-3">
+                                        <Form.Control type="file" onChange={(e) => setFile(e.target.files[0])} size="sm" className="rounded-pill" />
+                                    </Form.Group>
+                                    <Button onClick={handleUpload} disabled={!file || loading} className="btn-premium w-100 rounded-pill">
+                                        {loading ? <Spinner size="sm" /> : 'Run HR Audit'}
+                                    </Button>
+                                </Card.Body>
+                            </Card>
+                        )}
 
-                    <Row>
-                        {/* Filters Panel */}
-                        <Col md={4}>
-                            <Card className="glass-card mb-4">
-                                <Card.Header className="bg-transparent border-0 pt-4 pb-0">
-                                    <h5 className="mb-0"><FaFilter className="me-2 text-primary" /> Policy Constraints</h5>
+                        {data.length > 0 && (
+                            <Card className="simulator-card shadow-sm border-0 mb-4">
+                                <Card.Header className="bg-white border-bottom-0 pt-4 px-4">
+                                    <h5 className="mb-0 small fw-bold text-uppercase tracking-wider text-primary">
+                                        <FaFilter className="me-2" /> Policy Filters
+                                    </h5>
                                 </Card.Header>
-                                <Card.Body>
-                                    <Form.Group className="mb-3">
+                                <Card.Body className="px-4 pb-4">
+                                    <Form.Group className="mb-4">
                                         <Form.Label className="d-flex justify-content-between small fw-bold">
-                                            <span>Minimum Age</span>
-                                            <span className="text-primary">{filters.age_min || 18}</span>
+                                            Minimum Age Threshold <span>{filters.age_min || 18}y</span>
                                         </Form.Label>
-                                        <Form.Range
-                                            min={18} max={65} step={1}
-                                            value={filters.age_min || 18}
-                                            onChange={(e) => handleFilterChange('age_min', e.target.value)}
-                                        />
+                                        <input type="range" className="form-range" min="18" max="65"
+                                            value={filters.age_min || 18} 
+                                            onChange={(e) => handleFilterChange('age_min', e.target.value)} />
                                     </Form.Group>
-                                    <Form.Group className="mb-3">
+                                    <Form.Group className="mb-4">
                                         <Form.Label className="d-flex justify-content-between small fw-bold">
-                                            <span>Minimum Rating</span>
-                                            <span className="text-primary">{filters.rating_min || 1}</span>
+                                            Minimum Rating <span>{filters.rating_min || 1}★</span>
                                         </Form.Label>
-                                        <Form.Range
-                                            min={1} max={5} step={1}
-                                            value={filters.rating_min || 1}
-                                            onChange={(e) => handleFilterChange('rating_min', e.target.value)}
-                                        />
+                                        <input type="range" className="form-range" min="1" max="5"
+                                            value={filters.rating_min || 1} 
+                                            onChange={(e) => handleFilterChange('rating_min', e.target.value)} />
                                     </Form.Group>
-                                    <Form.Group className="mb-3">
+                                    <Form.Group className="mb-4">
                                         <Form.Label className="d-flex justify-content-between small fw-bold">
-                                            <span>Minimum Tenure</span>
-                                            <span className="text-primary">{filters.tenure_min || 0}</span>
+                                            Minimum Tenure <span>{filters.tenure_min || 0}y</span>
                                         </Form.Label>
-                                        <Form.Range
-                                            min={0} max={20} step={1}
-                                            value={filters.tenure_min || 0}
-                                            onChange={(e) => handleFilterChange('tenure_min', e.target.value)}
-                                        />
+                                        <input type="range" className="form-range" min="0" max="20"
+                                            value={filters.tenure_min || 0} 
+                                            onChange={(e) => handleFilterChange('tenure_min', e.target.value)} />
                                     </Form.Group>
 
-                                    <Button variant="outline-primary" className="w-100 mt-2" onClick={applyFilters} disabled={loading}>
-                                        {loading ? 'Recalculating...' : 'Apply Thresholds'}
+                                    <Button onClick={applyFilters} className="btn-premium w-100 py-2 shadow-sm rounded-pill" disabled={loading}>
+                                        {loading ? <Spinner size="sm" /> : 'Apply & Re-audit'}
                                     </Button>
 
                                     {suggestedPolicy && (
-                                        <div className="mt-4 p-3 bg-light rounded border border-warning">
-                                            <h6 className="text-warning mb-2">⭐ Suggested Optimum Strategy</h6>
+                                        <div className="mt-4 p-3 bg-light rounded-4 border border-warning border-dashed">
+                                            <h6 className="text-warning small fw-bold mb-2">⭐ ML Strategy Guide</h6>
                                             {Array.isArray(suggestedPolicy) ? (
-                                                <ul className="small mb-0">
-                                                    {suggestedPolicy.map((item, i) => <li key={i}>{item}</li>)}
+                                                <ul className="small mb-0 ps-3">
+                                                    {suggestedPolicy.map((item, i) => <li key={i} className="text-muted">{item}</li>)}
                                                 </ul>
                                             ) : (typeof suggestedPolicy === 'object' && suggestedPolicy !== null) ? (
-                                                <>
-                                                    <p className="small mb-0">For minimum risk, focus on:</p>
-                                                    <ul className="small mb-0 mt-1">
-                                                        {Object.entries(suggestedPolicy).map(([k, v]) => (
-                                                            <li key={k}><b>{k.replace(/_/g, ' ')}</b>: {v}</li>
-                                                        ))}
-                                                    </ul>
-                                                </>
+                                                <div className="small">
+                                                    {Object.entries(suggestedPolicy).map(([k, v]) => (
+                                                        <div key={k} className="mb-1">
+                                                            <b className="text-capitalize">{k.replace(/_/g, ' ')}</b>: {v}
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             ) : (
-                                                <p className="small mb-0">{suggestedPolicy}</p>
+                                                <p className="small mb-0 text-muted">{suggestedPolicy}</p>
                                             )}
                                         </div>
                                     )}
                                 </Card.Body>
                             </Card>
-                        </Col>
+                        )}
+                    </div>
+                </Col>
 
-                        {/* Explainable AI & SHAP Panel */}
-                        <Col md={8}>
-                            <Card className="glass-card mb-4 min-vh-50">
-                                <Card.Body>
-                                    <div className="d-flex justify-content-between align-items-center mb-3">
-                                        <h5><FaChartBar className="me-2 text-primary" /> AI Decision Drivers (SHAP)</h5>
+                {/* Right Content */}
+                <Col lg={8}>
+                    {metrics ? (
+                        <>
+                            <Row className="g-3 mb-4">
+                                <Col sm={4}>
+                                    <Card className="simulator-card text-center p-3 border-0 bg-white shadow-sm">
+                                        <small className="text-muted d-block mb-1">Evaluated</small>
+                                        <h4 className="fw-bold mb-0">{metrics.records_evaluated || metrics.total_records}</h4>
+                                    </Card>
+                                </Col>
+                                <Col sm={4}>
+                                    <Card className="simulator-card text-center p-3 border-0 bg-white shadow-sm border-start border-success border-4">
+                                        <small className="text-muted d-block mb-1">Selected/Retained</small>
+                                        <h4 className="fw-bold mb-0 text-success">{metrics.eligible || metrics.best_case}</h4>
+                                    </Card>
+                                </Col>
+                                <Col sm={4}>
+                                    <Card className="simulator-card text-center p-3 border-0 bg-white shadow-sm border-start border-danger border-4">
+                                        <small className="text-muted d-block mb-1">Rejected/Attrition</small>
+                                        <h4 className="fw-bold mb-0 text-danger">{metrics.rejected || metrics.worst_case}</h4>
+                                    </Card>
+                                </Col>
+                            </Row>
+
+                            <Card className="simulator-card border-0 mb-4 overflow-hidden shadow-sm">
+                                <Card.Header className="bg-white border-bottom-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                                    <h5 className="mb-0"><FaChartBar className="me-2 text-info" /> Population Impact</h5>
+                                    <div className="metric-badge bg-info bg-opacity-10 text-info">
+                                        Efficiency: {((metrics.eligibility_rate || 0) * 100).toFixed(1)}%
                                     </div>
+                                </Card.Header>
+                                <Card.Body className="p-4">
+                                    <div style={{ height: '300px' }}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={[
+                                                { name: 'Selected', count: metrics.eligible || metrics.best_case, fill: '#27ae60' },
+                                                { name: 'Excluded', count: metrics.rejected || metrics.worst_case, fill: '#e74c3c' }
+                                            ]}>
+                                                <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                                                <YAxis axisLine={false} tickLine={false} />
+                                                <Tooltip cursor={{fill: 'rgba(0,0,0,0.02)'}} />
+                                                <Bar dataKey="count" radius={[10, 10, 0, 0]} barSize={60} />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </Card.Body>
+                            </Card>
 
-                                    {shapData.length > 0 ? (
+                            {/* Gemini AI Card */}
+                            <Card className="simulator-card border-0 bg-primary text-white mb-4 shadow-lg">
+                                <Card.Body className="p-4">
+                                    <div className="d-flex justify-content-between align-items-center mb-4">
+                                        <h5 className="mb-0 fs-5 fw-bold"><FaRobot className="me-2" /> Gemini Strategic HR Insights</h5>
+                                        <Button variant="outline-light" size="sm" className="rounded-pill px-3 py-1" onClick={() => generatePolicyReport('hr', metrics, filters, geminiData)}>
+                                            <FaDownload className="me-1 small" /> Export Analysis
+                                        </Button>
+                                    </div>
+                                    
+                                    {geminiData && geminiData.scenarios ? (
+                                        <div className="bg-white rounded-4 p-1 overflow-hidden shadow-sm mb-4">
+                                            <div className="table-responsive">
+                                                <Table hover className="mb-0 align-middle border-0">
+                                                    <thead className="bg-light">
+                                                        <tr className="border-0">
+                                                            <th className="py-3 ps-4 border-0 text-dark small fw-bold">Scenario</th>
+                                                            <th className="py-3 border-0 text-dark small fw-bold">Strategy</th>
+                                                            <th className="py-3 border-0 text-dark small fw-bold">Employee Impact</th>
+                                                            <th className="py-3 border-0 text-dark small fw-bold pe-4">Risk Control</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {geminiData.scenarios.map((s, idx) => (
+                                                            <tr key={idx} className="border-bottom">
+                                                                <td className="ps-4 py-3 fw-bold text-primary small">{s.scenario}</td>
+                                                                <td className="py-3 text-muted small">{s.strategic_focus}</td>
+                                                                <td className="py-3 text-muted small">{s.client_impact}</td>
+                                                                <td className="py-3 text-muted small pe-4">{s.risk_control}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </Table>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-5 border border-light border-2 border-dashed rounded-4 opacity-50">
+                                            <p className="mb-0 small">{loading ? 'Synthesizing strategic insights...' : 'Apply policy to see Gemini Strategic Analysis'}</p>
+                                        </div>
+                                    )}
+
+                                    {geminiData && geminiData.overall_summary && (
+                                        <div className="p-3 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-10">
+                                            <h6 className="fw-bold mb-2 small text-uppercase tracking-wider">Executive View:</h6>
+                                            <p className="mb-0 small opacity-90" style={{ lineHeight: '1.6' }}>{geminiData.overall_summary}</p>
+                                        </div>
+                                    )}
+                                </Card.Body>
+                            </Card>
+
+                            {/* SHAP Insights */}
+                            {shapData && shapData.length > 0 && (
+                                <Card className="simulator-card border-0 mb-4 shadow-sm">
+                                    <Card.Header className="bg-white border-bottom-0 pt-4 px-4">
+                                        <h5 className="mb-0"><FaChartLine className="me-2 text-warning" /> Decision Factor Impact (SHAP)</h5>
+                                    </Card.Header>
+                                    <Card.Body className="p-4">
                                         <div style={{ height: '300px' }}>
                                             <ResponsiveContainer width="100%" height="100%">
-                                                <BarChart data={shapData} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
+                                                <BarChart data={shapData} layout="vertical">
                                                     <XAxis type="number" hide />
-                                                    <YAxis dataKey="feature" type="category" axisLine={false} tickLine={false} width={100} />
-                                                    <Tooltip cursor={{ fill: 'transparent' }} />
-                                                    <Bar dataKey="importance" fill="var(--primary-color)" radius={[0, 4, 4, 0]} barSize={20} />
+                                                    <YAxis dataKey="feature" type="category" width={120} axisLine={false} tickLine={false} className="small" />
+                                                    <Tooltip cursor={{fill: 'transparent'}} />
+                                                    <Bar dataKey="importance" fill="#4361ee" radius={[0, 10, 10, 0]} barSize={20} />
                                                 </BarChart>
                                             </ResponsiveContainer>
                                         </div>
-                                    ) : (
-                                        <div className="text-center text-muted p-5 bg-light rounded" style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                            Adjust thresholds and apply to automatically run SHAP impact calculations.
-                                        </div>
-                                    )}
-                                </Card.Body>
-                            </Card>
-
-                            {/* Gemini Summary Section */}
-                            <Card className="glass-card bg-primary text-white">
-                                <Card.Body>
-                                    <div className="d-flex justify-content-between align-items-center mb-3">
-                                        <h5 className="mb-0"><FaRobot className="me-2" /> Gemini AI HR Summary</h5>
-                                        <div className="d-flex align-items-center">
-                                            <Form.Select size="sm" className="me-2" style={{ width: '150px' }} value={scenario} onChange={e => { setScenario(e.target.value); setTimeout(() => fetchSummary(), 100); }}>
-                                                <option value="Best Case">Best Case</option>
-                                                <option value="Average Case">Average Case</option>
-                                                <option value="Worst Case">Worst Case</option>
-                                            </Form.Select>
-                                        </div>
-                                    </div>
-                                    {geminiSummary ? (
-                                        <p className="mb-0 lh-lg" style={{ opacity: 0.9 }}>{geminiSummary}</p>
-                                    ) : (
-                                        <p className="mb-0 text-white-50 small">No summary generated yet. Click above to request a comprehensive natural language analysis of the current HR policy metrics.</p>
-                                    )}
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                    </Row>
-                </>
-            )}
+                                    </Card.Body>
+                                </Card>
+                            )}
+                        </>
+                    ) : (
+                        <div className="text-center py-5 mt-5">
+                            <FaUserTie size={80} className="text-light mb-4" />
+                            <h3 className="text-muted">HR Simulation Inactive</h3>
+                            <p className="text-muted">Load employee or candidate data to begin modeling strategic impacts.</p>
+                        </div>
+                    )}
+                </Col>
+            </Row>
         </div>
     );
 };

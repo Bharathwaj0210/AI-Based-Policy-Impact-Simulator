@@ -390,23 +390,50 @@ You are an expert actuary and insurance risk analyst for the {insurance_type} do
 Current Policy Thresholds: {filters}
 Current Impact Metrics: {metrics}
 
-Provide a clear, easy-to-understand explanation of why the ML model suggested this rule.
-Structure your response into the following three scenarios:
-- **Best Case Scenario**: Explain how this rule performs for clearly low-risk applicants.
-- **Average Case Scenario**: Explain the expected performance for typical, moderate-risk applicants.
-- **Worst Case Scenario**: Explain how this rule protects the organization from high-risk or outlier claims.
-
-Then, briefly summarize:
-1. The demographic reach and applicant impact.
-2. How this reduces overall risk exposure.
-
-Keep the language simple and avoid technical jargon. Use bolding and bullet points for readability.
+INSTRUCTIONS:
+Provide a detailed and granular comparison of three performance scenarios: Best Case, Average Case, and Worst Case.
+You MUST return the data in a strict JSON format with the following structure:
+{{
+  "scenarios": [
+    {{
+      "scenario": "Best Case",
+      "strategic_focus": "Short focus point (10-15 words)",
+      "client_impact": "Short impact point (10-15 words)",
+      "risk_control": "Short control point (10-15 words)"
+    }},
+    {{
+      "scenario": "Average Case",
+      "strategic_focus": "...",
+      "client_impact": "...",
+      "risk_control": "..."
+    }},
+    {{
+      "scenario": "Worst Case",
+      "strategic_focus": "...",
+      "client_impact": "...",
+      "risk_control": "..."
+    }}
+  ],
+  "overall_summary": "A concise 2-sentence summary of the policy's demographic reach and risk reduction mechanism."
+}}
 """
-            response = model.generate_content(prompt)
-            return Response({
-                "status": "success",
-                "explanation": response.text
-            })
+            response = model.generate_content(
+                prompt,
+                generation_config={"response_mime_type": "application/json"}
+            )
+            try:
+                result = json.loads(response.text)
+                return Response({
+                    "status": "success",
+                    "scenarios": result.get("scenarios", []),
+                    "overall_summary": result.get("overall_summary", "")
+                })
+            except Exception as json_err:
+                print(f"JSON Parse Error in Insurance Gemini: {json_err}")
+                return Response({
+                    "status": "success",
+                    "explanation": response.text  # Fallback
+                })
         except Exception as e:
             import traceback
             print("ERROR IN InsuranceGeminiSummaryView:")
