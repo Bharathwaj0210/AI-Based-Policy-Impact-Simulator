@@ -381,30 +381,27 @@ class InsuranceGeminiSummaryView(APIView):
             
         genai.configure(api_key=api_key)
         try:
-            model = genai.GenerativeModel("gemini-1.5-flash")
-            response = model.generate_content("test")
-        except Exception as e1:
-            try:
-                model = genai.GenerativeModel("gemini-pro")
-                model.generate_content("test")
-            except Exception as e2:
-                return Response({"error": f"Gemini Error (1.5-flash): {str(e1)} | (Pro): {str(e2)}"}, status=500)
-        
-        prompt = f"""
+            # Trying 2.5-flash if others are failing
+            model = genai.GenerativeModel("gemini-2.5-flash")
+            
+            prompt = f"""
 You are an expert actuary and insurance risk analyst for the {insurance_type} domain.
 
 Current Policy Thresholds: {filters}
 Current Impact Metrics: {metrics}
 
-Provide a concise explanation addressing ONLY these three points:
-1. Why the recommended policy thresholds are optimal.
-2. The estimated demographic reach (how many applicants will benefit or make use of it).
-3. How this specific rule type reduces false claims and limits risk exposure.
+Provide a clear, easy-to-understand explanation of why the ML model suggested this rule.
+Structure your response into the following three scenarios:
+- **Best Case Scenario**: Explain how this rule performs for clearly low-risk applicants.
+- **Average Case Scenario**: Explain the expected performance for typical, moderate-risk applicants.
+- **Worst Case Scenario**: Explain how this rule protects the organization from high-risk or outlier claims.
 
-AI is used strictly to explain the data insights based on these three points.
+Then, briefly summarize:
+1. The demographic reach and applicant impact.
+2. How this reduces overall risk exposure.
+
+Keep the language simple and avoid technical jargon. Use bolding and bullet points for readability.
 """
-        
-        try:
             response = model.generate_content(prompt)
             return Response({
                 "status": "success",
@@ -414,7 +411,7 @@ AI is used strictly to explain the data insights based on these three points.
             import traceback
             print("ERROR IN InsuranceGeminiSummaryView:")
             traceback.print_exc()
-            return Response({"error": str(e)}, status=500)
+            return Response({"error": f"Gemini Error: {str(e)}"}, status=500)
 
 class InsurancePolicyListView(APIView):
     def get(self, request):

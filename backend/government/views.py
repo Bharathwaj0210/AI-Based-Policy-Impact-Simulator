@@ -218,33 +218,35 @@ class GovernmentGeminiSummaryView(APIView):
         if not api_key:
             return Response({"error": "GEMINI_API_KEY not found in environment"}, status=500)
             
+        genai.configure(api_key=api_key)
         try:
-            model = genai.GenerativeModel("gemini-1.5-flash")
-            model.generate_content("test")
-        except Exception as e1:
-            try:
-                model = genai.GenerativeModel("gemini-pro")
-                model.generate_content("test")
-            except Exception as e2:
-                return Response({"error": f"Gemini Error (1.5-flash): {str(e1)} | (Pro): {str(e2)}"}, status=500)
-        
-        prompt = f"""
+            model = genai.GenerativeModel("gemini-2.5-flash")
+            
+            prompt = f"""
 You are an expert policy advisor analyzing {policy} policy data.
 
 Current Policy Thresholds: {filters}
 Current Impact Metrics: {metrics}
 
-Provide a concise explanation (strictly addressing these three points):
-1. Why the recommended policy threshold is optimal.
-2. The estimated demographic reach (how many citizens will utilize it based on current metrics).
-3. How this specific rule mitigates the risk of false claims or improper allocations.
+Provide a clear, easy-to-understand explanation of why the ML model suggested this rule.
+Structure your response into the following three scenarios:
+- **Best Case Scenario**: Explain how this rule performs when applicants are clearly eligible.
+- **Average Case Scenario**: Explain the expected performance for typical, moderate-case citizens.
+- **Worst Case Scenario**: Explain how this rule protects the organization from high-risk or outlier claims (e.g., improper allocations).
+
+Then, briefly summarize:
+1. The estimated demographic reach and citizen impact.
+2. How this reduces overall risk or improper allocations.
+
+Keep the language simple and avoid technical jargon. Use bolding and bullet points for readability.
 """
-        
-        try:
             response = model.generate_content(prompt)
             return Response({
                 "status": "success",
                 "explanation": response.text
             })
         except Exception as e:
-            return Response({"error": str(e)}, status=500)
+            import traceback
+            print("ERROR IN GovernmentGeminiSummaryView:")
+            traceback.print_exc()
+            return Response({"error": f"Gemini Error: {str(e)}"}, status=500)

@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE = 'http://127.0.0.1:8000/api';
+// Use environment variable for production, fallback to localhost for development
+const API_BASE = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000/api';
 
 export const uploadDataset = async (domain, file, extraData = {}) => {
     const formData = new FormData();

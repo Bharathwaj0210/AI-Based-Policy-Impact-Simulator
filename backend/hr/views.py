@@ -238,38 +238,39 @@ class HRGeminiSummaryView(APIView):
         if not api_key:
             return Response({"error": "GEMINI_API_KEY not found in environment"}, status=500)
             
+        genai.configure(api_key=api_key)
         try:
-            model = genai.GenerativeModel("gemini-1.5-flash")
-            model.generate_content("test")
-        except Exception as e1:
-            try:
-                model = genai.GenerativeModel("gemini-pro")
-                model.generate_content("test")
-            except Exception as e2:
-                return Response({"error": f"Gemini Error (1.5-flash): {str(e1)} | (Pro): {str(e2)}"}, status=500)
-        
-        prompt = f"""
+            model = genai.GenerativeModel("gemini-2.5-flash")
+            
+            prompt = f"""
 You are an HR analytics expert analyzing the {scenario} scenario for the {policy_option} policy.
 
 Current Policy Thresholds: {filters}
 Current Impact Metrics: {metrics}
-Dataset summary:
-{summary_data}
+Dataset summary: {summary_data}
 
-Provide a concise explanation addressing ONLY these three points:
-1. Why the recommended policy rules are perfect for mitigating risks.
-2. The estimated workforce impact (how many employees will be affected/make use of it).
-3. How this specific rule type reduces false claims (e.g., unjustified attrition risk flags or poor recruitment fits).
+Provide a clear, easy-to-understand explanation of the optimized rule suggested by the ML model.
+Structure your response into the following three scenarios:
+- **Best Case Scenario**: Explain how this rule performs for clearly ideal employees or fits.
+- **Average Case Scenario**: Explain the expected performance for typical, moderate-fit applicants.
+- **Worst Case Scenario**: Explain how this rule protects the organization from high-risk or outlier cases (e.g., poor cultural fit or low retention risk).
+
+Then, briefly summarize:
+1. The estimated workforce impact and applicant reach.
+2. How this reduces overall risk (e.g., unjustified attrition risk flags).
+
+Keep the language simple and avoid technical jargon. Use bolding and bullet points for readability.
 """
-        
-        try:
             response = model.generate_content(prompt)
             return Response({
                 "status": "success",
                 "explanation": response.text
             })
         except Exception as e:
-            return Response({"error": str(e)}, status=500)
+            import traceback
+            print("ERROR IN HRGeminiSummaryView:")
+            traceback.print_exc()
+            return Response({"error": f"Gemini Error: {str(e)}"}, status=500)
 
 class HRPolicyListView(APIView):
     def get(self, request):
