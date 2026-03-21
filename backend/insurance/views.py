@@ -2,7 +2,6 @@ import os
 import json
 import pandas as pd
 import numpy as np
-import shap
 import google.generativeai as genai
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -280,6 +279,7 @@ class InsuranceExplainView(APIView):
             return Response({"error": "No data provided"}, status=400)
             
         try:
+            import shap
             df = pd.DataFrame(data)
             model_type_map = {"Health Insurance": "health", "Vehicle Insurance": "vehicle"}
             mapped_type = model_type_map.get(insurance_type, "health")
