@@ -111,11 +111,19 @@ const HR = () => {
                                     <FaUpload size={40} className="text-primary opacity-25 mb-3" />
                                     <h6 className="fw-bold">Step 1: Upload Dataset</h6>
                                     <p className="small text-muted mb-3">Load your HR or candidate CSV to begin strategic modeling.</p>
+
+                                    <div className="bg-light p-3 rounded-4 mb-4 text-start border border-primary border-opacity-10">
+                                        <p className="small fw-bold text-primary mb-2">Required CSV Columns:</p>
+                                        <code className="x-small d-block text-muted" style={{ fontSize: '0.75rem', lineHeight: '1.4' }}>
+                                            age, tenureyears, performance score, current employee rating, isactive
+                                        </code>
+                                    </div>
+
                                     <Form.Group className="mb-3">
                                         <Form.Control type="file" onChange={(e) => setFile(e.target.files[0])} size="sm" className="rounded-pill" />
                                     </Form.Group>
                                     <Button onClick={handleUpload} disabled={!file || loading} className="btn-premium w-100 rounded-pill">
-                                        {loading ? <Spinner size="sm" /> : 'Run HR Audit'}
+                                        {loading ? <Spinner size="sm" /> : 'Start Simulation'}
                                     </Button>
                                 </Card.Body>
                             </Card>

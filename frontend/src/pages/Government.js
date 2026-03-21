@@ -163,18 +163,26 @@ const Government = () => {
                             </Card.Body>
                         </Card>
 
-                        {/* File Upload */}
+                        {/* File Upload Card */}
                         {!data.length && (
                             <Card className="simulator-card shadow-sm border-0 mb-4">
                                 <Card.Body className="p-4 text-center">
                                     <FaUpload size={40} className="text-primary opacity-25 mb-3" />
-                                    <h6 className="fw-bold">Step 1: Census Data Ingestion</h6>
-                                    <p className="small text-muted mb-3">Upload citizen application data to begin legislative modeling.</p>
+                                    <h6 className="fw-bold">Step 1: Load Census Data</h6>
+                                    <p className="small text-muted mb-3">Upload your population dataset to begin legislative impact analysis.</p>
+
+                                    <div className="bg-light p-3 rounded-4 mb-4 text-start border border-primary border-opacity-10">
+                                        <p className="small fw-bold text-primary mb-2">Required CSV Columns:</p>
+                                        <code className="x-small d-block text-muted" style={{ fontSize: '0.75rem', lineHeight: '1.4' }}>
+                                            age, gender, annual_income, education_level, disability_status, family_size, employment_status, owns_house
+                                        </code>
+                                    </div>
+
                                     <Form.Group className="mb-3">
                                         <Form.Control type="file" onChange={(e) => setFile(e.target.files[0])} size="sm" className="rounded-pill" />
                                     </Form.Group>
                                     <Button onClick={handleUpload} disabled={!file || loading} className="btn-premium w-100 rounded-pill">
-                                        {loading ? <Spinner size="sm" /> : 'Ingest & Model'}
+                                        {loading ? <Spinner size="sm" /> : 'Start Simulation'}
                                     </Button>
                                 </Card.Body>
                             </Card>

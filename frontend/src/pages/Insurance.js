@@ -123,6 +123,17 @@ const Insurance = () => {
                                     <FaUpload size={40} className="text-primary opacity-25 mb-3" />
                                     <h6 className="fw-bold">Step 1: Load Dataset</h6>
                                     <p className="small text-muted mb-3">Please upload your insurance master file to begin impact analysis.</p>
+                                    
+                                    <div className="bg-light p-3 rounded-4 mb-4 text-start border border-primary border-opacity-10">
+                                        <p className="small fw-bold text-primary mb-2">Required CSV Columns:</p>
+                                        <code className="x-small d-block text-muted" style={{ fontSize: '0.75rem', lineHeight: '1.4' }}>
+                                            {insuranceType === 'Health Insurance' 
+                                                ? 'age, sex, bmi, children, smoker, region'
+                                                : 'vehicle_age, vehicle_type, engine_capacity, fuel_type, vehicle_value, owner_age, owner_gender, driving_experience_years, accident_history, annual_mileage, claim_frequency, no_claim_bonus, policy_type, urban_vs_rural'
+                                            }
+                                        </code>
+                                    </div>
+
                                     <Form.Group className="mb-3">
                                         <Form.Control type="file" onChange={(e) => setFile(e.target.files[0])} size="sm" className="rounded-pill" />
                                     </Form.Group>

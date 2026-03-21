@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 /**
  * Generates a professional PDF report for Policy Simulations
@@ -12,7 +12,7 @@ export const generatePolicyReport = (domain, metrics, filters, geminiData) => {
     // 1. Header
     doc.setFontSize(22);
     doc.setTextColor(40, 44, 52);
-    doc.text(`AI Policy simulation Report`, 14, 22);
+    doc.text(`Policy Simulation Report`, 14, 22);
     
     doc.setFontSize(14);
     doc.setTextColor(100);
@@ -37,7 +37,7 @@ export const generatePolicyReport = (domain, metrics, filters, geminiData) => {
         ['Eligibility Rate', `${((metrics.eligibility_rate || 0) * 100).toFixed(1)}%`]
     ];
 
-    doc.autoTable({
+    autoTable(doc, {
         startY: yPos,
         head: [metricsTable[0]],
         body: metricsTable.slice(1),
@@ -46,10 +46,10 @@ export const generatePolicyReport = (domain, metrics, filters, geminiData) => {
     });
     yPos = doc.lastAutoTable.finalY + 15;
 
-    // 3. AI Strategic Comparison
+    // 3. Strategic Case Comparison
     if (geminiData && geminiData.scenarios) {
         doc.setFontSize(16);
-        doc.text('AI Strategic Case Comparison', 14, yPos);
+        doc.text('Strategic Case Comparison', 14, yPos);
         yPos += 8;
 
         const scenarioHeaders = ['Scenario', 'Strategic Focus', 'Target Impact', 'Risk Control'];
@@ -60,7 +60,7 @@ export const generatePolicyReport = (domain, metrics, filters, geminiData) => {
             s.risk_control
         ]);
 
-        doc.autoTable({
+        autoTable(doc, {
             startY: yPos,
             head: [scenarioHeaders],
             body: scenarioBody,
