@@ -2,7 +2,6 @@ import os
 import json
 import pandas as pd
 import numpy as np
-import shap
 import google.generativeai as genai
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -150,6 +149,7 @@ class GovernmentExplainView(APIView):
             return Response({"error": "No data provided"}, status=400)
             
         try:
+            import shap
             df = pd.DataFrame(data)
             service = GovernmentPredictionService()
             

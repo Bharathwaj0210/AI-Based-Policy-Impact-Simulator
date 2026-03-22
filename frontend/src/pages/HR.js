@@ -4,6 +4,7 @@ import { Form, Button, Row, Col, Card, Spinner, Table } from 'react-bootstrap';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { FaUpload, FaRobot, FaFilter, FaChartBar, FaUserTie, FaDownload, FaChartLine } from 'react-icons/fa';
 import { generatePolicyReport } from '../utils/reportGenerator';
+import { downloadCSV } from '../utils/csvHelper';
 
 const HR = () => {
     const [file, setFile] = useState(null);
@@ -66,6 +67,20 @@ const HR = () => {
         }
         setLoading(false);
     };
+
+    const exportData = (eligible) => {
+        const filtered = data.filter(row => {
+            const passAge = (parseFloat(row.age) || 0) >= (filters.age_min || 18);
+            const passRating = (parseFloat(row['current employee rating']) || 0) >= (filters.rating_min || 1);
+            const passTenure = (parseFloat(row.tenureyears) || 0) >= (filters.tenure_min || 0);
+            const isMatch = passAge && passRating && passTenure;
+            return eligible ? isMatch : !isMatch;
+        });
+
+        const filename = `${hrType.replace(/\s+/g, '_')}_${eligible ? 'Eligible' : 'Ineligible'}_List.csv`;
+        downloadCSV(filtered, filename);
+    };
+
 
     return (
         <div className="hr-container fade-in">
@@ -221,7 +236,15 @@ const HR = () => {
                                 <Card.Header className="bg-white border-bottom-0 pt-4 px-4 d-flex justify-content-between align-items-center">
                                     <h5 className="mb-0"><FaChartBar className="me-2 text-info" /> Population Impact</h5>
                                     <div className="metric-badge bg-info bg-opacity-10 text-info">
-                                        Efficiency: {((metrics.eligibility_rate || 0) * 100).toFixed(1)}%
+                                        Success Rate: {(metrics.eligibility_rate * 100).toFixed(1)}%
+                                    </div>
+                                    <div className="d-flex gap-2">
+                                        <Button variant="outline-success" size="sm" className="rounded-pill" onClick={() => exportData(true)}>
+                                            <FaDownload className="me-1" /> Eligible CSV
+                                        </Button>
+                                        <Button variant="outline-danger" size="sm" className="rounded-pill" onClick={() => exportData(false)}>
+                                            <FaDownload className="me-1" /> Ineligible CSV
+                                        </Button>
                                     </div>
                                 </Card.Header>
                                 <Card.Body className="p-4">

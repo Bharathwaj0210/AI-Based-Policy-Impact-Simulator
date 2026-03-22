@@ -4,6 +4,7 @@ import { Form, Button, Row, Col, Card, Spinner, Table } from 'react-bootstrap';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { FaUpload, FaRobot, FaFilter, FaChartBar, FaLandmark, FaDownload, FaChartLine } from 'react-icons/fa';
 import { generatePolicyReport } from '../utils/reportGenerator';
+import { downloadCSV } from '../utils/csvHelper';
 
 const POLICY_CONDITIONS = {
     scholarship: {
@@ -102,6 +103,39 @@ const Government = () => {
             setFilters(prev => ({ ...prev, [feature]: value }));
         }
     };
+
+    const exportData = (eligible) => {
+        const conds = POLICY_CONDITIONS[policyType] || {};
+        const filtered = data.filter(row => {
+            let isMatch = true;
+            Object.keys(conds).forEach(col => {
+                const config = conds[col];
+                const val = row[col];
+                if (config.type === 'max') {
+                    if ((parseFloat(val) || 0) > (parseFloat(filters[col]) || config.default)) isMatch = false;
+                } else if (config.type === 'min') {
+                    if ((parseFloat(val) || 0) < (parseFloat(filters[col]) || config.default)) isMatch = false;
+                } else if (config.type === 'multiselect') {
+                    const allowed = filters[col] || [];
+                    if (!allowed.includes((val || 'unknown').toString())) isMatch = false;
+                } else if (config.type === 'disability_filter') {
+                    const filterVal = filters[col];
+                    const isDis = (val === 1 || val === true || (val || '').toString().toLowerCase() === 'yes');
+                    if (filterVal === "Disabled only" && !isDis) isMatch = false;
+                    if (filterVal === "Non-disabled only" && isDis) isMatch = false;
+                } else if (config.type === 'binary') {
+                    if (filters[col]) {
+                        if (val === 1 || val === true || (val || '').toString().toLowerCase() === 'yes' || val === '1') isMatch = false;
+                    }
+                }
+            });
+            return eligible ? isMatch : !isMatch;
+        });
+
+        const filename = `${policyType.replace(' ', '_')}_${eligible ? 'Eligible' : 'Ineligible'}_List.csv`;
+        downloadCSV(filtered, filename);
+    };
+
 
     const applyFilters = async () => {
         setLoading(true);
@@ -301,8 +335,16 @@ const Government = () => {
                             <Card className="simulator-card border-0 mb-4 overflow-hidden shadow-sm">
                                 <Card.Header className="bg-white border-bottom-0 pt-4 px-4 d-flex justify-content-between align-items-center">
                                     <h5 className="mb-0"><FaChartBar className="me-2 text-info" /> Public Welfare Reach</h5>
-                                    <div className="metric-badge bg-info bg-opacity-10 text-info">
-                                        Coverage: {(metrics.eligibility_rate * 100).toFixed(1)}%
+                                    <div className="metric-badge bg-primary bg-opacity-10 text-primary">
+                                        Impact Rate: {(metrics.eligibility_rate * 100).toFixed(1)}%
+                                    </div>
+                                    <div className="d-flex gap-2">
+                                        <Button variant="outline-success" size="sm" className="rounded-pill" onClick={() => exportData(true)}>
+                                            <FaDownload className="me-1" /> Eligible CSV
+                                        </Button>
+                                        <Button variant="outline-danger" size="sm" className="rounded-pill" onClick={() => exportData(false)}>
+                                            <FaDownload className="me-1" /> Ineligible CSV
+                                        </Button>
                                     </div>
                                 </Card.Header>
                                 <Card.Body className="p-4">

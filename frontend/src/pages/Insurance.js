@@ -4,6 +4,7 @@ import { Form, Button, Row, Col, Card, Spinner, Table } from 'react-bootstrap';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { FaUpload, FaRobot, FaFilter, FaChartBar, FaShieldAlt, FaDownload, FaChartLine } from 'react-icons/fa';
 import { generatePolicyReport } from '../utils/reportGenerator';
+import { downloadCSV } from '../utils/csvHelper';
 
 const Insurance = () => {
     const [file, setFile] = useState(null);
@@ -78,6 +79,35 @@ const Insurance = () => {
         }
         setLoading(false);
     };
+
+    const exportData = (eligible) => {
+        let filtered;
+        if (insuranceType === 'Health Insurance') {
+            filtered = data.filter(row => {
+                const passAge = (parseFloat(row.age) || 0) <= (filters.max_age || 100);
+                const passBMI = (parseFloat(row.bmi) || 0) <= (filters.max_bmi || 100);
+                const passSmoker = filters.allow_smoker === 'Yes' || (row.smoker || '').toString().toLowerCase() === 'no';
+                const isMatch = passAge && passBMI && passSmoker;
+                return eligible ? isMatch : !isMatch;
+            });
+        } else {
+            filtered = data.filter(row => {
+                const passVehAge = (parseFloat(row.vehicle_age) || 0) <= (filters.max_vehicle_age || 100);
+                const passExp = (parseFloat(row.driving_experience) || 0) >= (filters.min_experience || 0);
+                const passCustAge = (parseFloat(row.customer_age) || 0) <= (filters.max_customer_age || 100);
+                const passValue = (parseFloat(row.value_vehicle) || 0) <= (filters.max_value_vehicle || 1000000);
+                const passCyl = (parseFloat(row.cylinder_capacity) || 0) <= (filters.max_cylinder_capacity || 10000);
+                const passPrem = (parseFloat(row.premium) || 0) <= (filters.max_premium || 100000);
+                
+                const isMatch = passVehAge && passExp && passCustAge && passValue && passCyl && passPrem;
+                return eligible ? isMatch : !isMatch;
+            });
+        }
+        
+        const filename = `${insuranceType.replace(' ', '_')}_${eligible ? 'Eligible' : 'Ineligible'}_List.csv`;
+        downloadCSV(filtered, filename);
+    };
+
 
     return (
         <div className="insurance-container fade-in">
@@ -284,6 +314,14 @@ const Insurance = () => {
                                     <h5 className="mb-0"><FaChartBar className="me-2 text-info" /> Eligibility Trends</h5>
                                     <div className="metric-badge bg-info bg-opacity-10 text-info">
                                         Success Rate: {(metrics.eligibility_rate * 100).toFixed(1)}%
+                                    </div>
+                                    <div className="d-flex gap-2">
+                                        <Button variant="outline-success" size="sm" className="rounded-pill" onClick={() => exportData(true)}>
+                                            <FaDownload className="me-1" /> Eligible CSV
+                                        </Button>
+                                        <Button variant="outline-danger" size="sm" className="rounded-pill" onClick={() => exportData(false)}>
+                                            <FaDownload className="me-1" /> Ineligible CSV
+                                        </Button>
                                     </div>
                                 </Card.Header>
                                 <Card.Body className="p-4">
