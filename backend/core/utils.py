@@ -1,5 +1,4 @@
 import os
-import joblib
 import pandas as pd
 import numpy as np
 from django.conf import settings
@@ -38,14 +37,35 @@ class BasePredictionService(ABC):
             # Optional, so we just log or ignore if missing
             pass
 
+    # Static cache to avoid reloading models in every request
+    _model_cache = {}
+
     def _load_artifacts(self):
-        self.model = joblib.load(self.model_path)
-        self.original_features = joblib.load(self.features_path)
+        # Cache key based on file path to uniquely identify the artifact
+        if self.model_path not in BasePredictionService._model_cache:
+            import joblib
+            BasePredictionService._model_cache[self.model_path] = joblib.load(self.model_path)
+        
+        self.model = BasePredictionService._model_cache[self.model_path]
+        
+        if self.features_path not in BasePredictionService._model_cache:
+            import joblib
+            BasePredictionService._model_cache[self.features_path] = joblib.load(self.features_path)
+            
+        self.original_features = BasePredictionService._model_cache[self.features_path]
+        
         # We still need normalized versions for alignment logic
         self.required_features = [f.lower().strip().replace(" ", "_") for f in self.original_features]
         # Create a mapping from normalized -> original
         self.feature_map = dict(zip(self.required_features, self.original_features))
-        self.aliases = joblib.load(self.aliases_path) if self.aliases_path and os.path.exists(self.aliases_path) else {}
+        
+        if self.aliases_path and os.path.exists(self.aliases_path):
+            if self.aliases_path not in BasePredictionService._model_cache:
+                import joblib
+                BasePredictionService._model_cache[self.aliases_path] = joblib.load(self.aliases_path)
+            self.aliases = BasePredictionService._model_cache[self.aliases_path]
+        else:
+            self.aliases = {}
 
     def normalize(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
