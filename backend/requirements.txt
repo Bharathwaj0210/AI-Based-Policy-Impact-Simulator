@@ -1,4 +1,5 @@
 Django>=5.1.0
+djangorestframework
 google-generativeai>=0.8.3
 scikit-learn==1.7.2
 pandas>=2.2.2
