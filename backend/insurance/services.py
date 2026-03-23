@@ -56,7 +56,7 @@ class InsurancePredictionService(BasePredictionService):
         optional_features = ["value_vehicle", "cylinder_capacity", "premium", "power", "weight"]
         for feat in optional_features:
             if feat in df.columns:
-                df[feat] = pd.to_numeric(df[feat], errors="coerce").fillna(0)
+                df[feat] = pd.to_numeric(df[feat], errors="coerce").fillna(0.0)
             
         # Fuel mapping (P=0, D=1)
         if "type_fuel" in df.columns:
@@ -73,33 +73,27 @@ class InsurancePredictionService(BasePredictionService):
         return df
 
     def predict(self, df):
-        try:
-            df = self.normalize(df)
-            df = self.apply_aliases(df)
+        df = self.normalize(df)
+        df = self.apply_aliases(df)
+        
+        # Application-specific preprocessing
+        if self.model_dir_name == "vehicle":
+            df = self.preprocess_vehicle(df)
             
-            # Application-specific preprocessing
-            if self.model_dir_name == "vehicle":
-                df = self.preprocess_vehicle(df)
-                
-            X, used_features = self.align_features(df)
+        X, used_features = self.align_features(df)
+        
+        # Predict risk
+        if hasattr(self.model, "predict_proba"):
+            predictions = self.model.predict_proba(X)[:, 1].tolist()
+        else:
+            predictions = self.model.predict(X).tolist()
             
-            # Predict risk
-            if hasattr(self.model, "predict_proba"):
-                predictions = self.model.predict_proba(X)[:, 1].tolist()
-            else:
-                predictions = self.model.predict(X).tolist()
-                
-            return {
-                "status": "success",
-                "predictions": predictions,
-                "used_features": used_features,
-                "config": getattr(self, "config", {})
-            }
-        except Exception as e:
-            import traceback
-            print(f"ERROR IN InsurancePredictionService.predict ({self.model_dir_name}):")
-            traceback.print_exc()
-            return {"status": "error", "message": str(e)}
+        return {
+            "status": "success",
+            "predictions": predictions,
+            "used_features": used_features,
+            "config": getattr(self, "config", {})
+        }
 
 def predict_insurance(data, insurance_type):
     service = InsurancePredictionService(insurance_type)

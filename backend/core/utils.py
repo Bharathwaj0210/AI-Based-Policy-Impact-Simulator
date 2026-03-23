@@ -100,19 +100,20 @@ class BasePredictionService(ABC):
         
         # Robustly handle types feature by feature
         for col in X.columns:
-            # If already numeric, just fill
-            if pd.api.types.is_numeric_dtype(X[col]):
-                X[col] = X[col].fillna(0)
+            print(f"DEBUG_ALIGN: Processing column '{col}' (current type: {X[col].dtype})", flush=True)
+            # Try numeric conversion first for ALL columns to see if they CAN be numeric
+            numeric_series = pd.to_numeric(X[col], errors='coerce')
+            
+            # If it's mostly numeric or already numeric, force it to float
+            if pd.api.types.is_numeric_dtype(X[col]) or numeric_series.notna().sum() > (len(X[col]) / 2):
+                print(f"DEBUG_ALIGN: Casting '{col}' to float", flush=True)
+                X.loc[:, col] = numeric_series.astype(float).fillna(0.0).values
             else:
-                # Try numeric conversion
-                numeric_series = pd.to_numeric(X[col], errors='coerce')
-                # If mostly numeric, keep as numeric
-                if numeric_series.notna().sum() > (len(X[col]) / 2):
-                    X[col] = numeric_series.fillna(0)
-                else:
-                    # Strictly categorical strings
-                    # Ensure no np.nan remains; use apply(str) or map
-                    X[col] = X[col].apply(lambda v: str(v) if pd.notna(v) and str(v).lower() != 'nan' else 'Unknown')
+                # Strictly categorical strings
+                # Ensure no np.nan remains
+                print(f"DEBUG_ALIGN: Mapping '{col}' to string", flush=True)
+                X.loc[:, col] = X[col].astype(str).replace(['nan', 'NaN', 'None', 'NoneType'], 'Unknown').values
+            print(f"DEBUG_ALIGN: Finished column '{col}'", flush=True)
         
         # IMPORTANT: Rename back to original casing for scikit-learn exact match
         X = X.rename(columns=self.feature_map)

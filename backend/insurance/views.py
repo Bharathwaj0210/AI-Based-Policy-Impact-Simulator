@@ -25,7 +25,8 @@ class InsuranceUploadView(APIView):
             # Map type to model directory naming
             model_type_map = {
                 "Health Insurance": "health",
-                "Vehicle Insurance": "vehicle"
+                "Vehicle Insurance": "vehicle",
+                "Motor Insurance": "vehicle"
             }
             mapped_type = model_type_map.get(insurance_type, "health")
             
@@ -159,7 +160,11 @@ class InsuranceFilterView(APIView):
             df = pd.DataFrame(data)
             eligible = pd.Series(True, index=df.index)
             
-            model_type_map = {"Health Insurance": "health", "Vehicle Insurance": "vehicle"}
+            model_type_map = {
+                "Health Insurance": "health", 
+                "Vehicle Insurance": "vehicle",
+                "Motor Insurance": "vehicle"
+            }
             mapped_type = model_type_map.get(insurance_type, "health")
             
             if "risk_score" not in df.columns:
@@ -281,7 +286,11 @@ class InsuranceExplainView(APIView):
         try:
             import shap
             df = pd.DataFrame(data)
-            model_type_map = {"Health Insurance": "health", "Vehicle Insurance": "vehicle"}
+            model_type_map = {
+                "Health Insurance": "health", 
+                "Vehicle Insurance": "vehicle",
+                "Motor Insurance": "vehicle"
+            }
             mapped_type = model_type_map.get(insurance_type, "health")
             
             # Apply dynamic filtering

@@ -248,8 +248,8 @@ const HR = () => {
                                     </div>
                                 </Card.Header>
                                 <Card.Body className="p-4">
-                                    <div style={{ height: '300px' }}>
-                                        <ResponsiveContainer width="100%" height="100%">
+                                    <div style={{ height: '300px', minHeight: '300px' }}>
+                                        <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                                             <BarChart data={[
                                                 { name: 'Selected', count: metrics.eligible || metrics.best_case, fill: '#27ae60' },
                                                 { name: 'Excluded', count: metrics.rejected || metrics.worst_case, fill: '#e74c3c' }
@@ -321,8 +321,8 @@ const HR = () => {
                                         <h5 className="mb-0"><FaChartLine className="me-2 text-warning" /> Decision Factor Impact (SHAP)</h5>
                                     </Card.Header>
                                     <Card.Body className="p-4">
-                                        <div style={{ height: '300px' }}>
-                                            <ResponsiveContainer width="100%" height="100%">
+                                        <div style={{ height: '300px', minHeight: '300px' }}>
+                                            <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                                                 <BarChart data={shapData} layout="vertical">
                                                     <XAxis type="number" hide />
                                                     <YAxis dataKey="feature" type="category" width={120} axisLine={false} tickLine={false} className="small" />
