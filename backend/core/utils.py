@@ -44,7 +44,7 @@ class BasePredictionService(ABC):
         # Cache key based on file path to uniquely identify the artifact
         if self.model_path not in BasePredictionService._model_cache:
             import joblib
-            BasePredictionService._model_cache[self.model_path] = joblib.load(self.model_path)
+            BasePredictionService._model_cache[self.model_path] = joblib.load(self.model_path, mmap_mode='r')
         
         self.model = BasePredictionService._model_cache[self.model_path]
         
