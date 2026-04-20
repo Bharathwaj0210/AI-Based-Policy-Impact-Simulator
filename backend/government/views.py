@@ -149,7 +149,6 @@ class GovernmentExplainView(APIView):
             return Response({"error": "No data provided"}, status=400)
             
         try:
-            import shap
             df = pd.DataFrame(data)
             service = GovernmentPredictionService()
             
@@ -157,44 +156,56 @@ class GovernmentExplainView(APIView):
             if len(df_filtered) == 0:
                 return Response({"status": "success", "shap_data": []})
                 
-            # Limit data for SHAP to ensure performance
-            df_shap = df_filtered.head(50)
-            X = prepare_model_input(df_shap, policy, service.required_features)
-            
+            X_full = prepare_model_input(df_filtered.head(1), policy, service.required_features)
             pipeline = service.model
             
             if hasattr(pipeline, "named_steps"):
                 preprocessor = pipeline.named_steps.get("preprocessor")
                 model_only = pipeline.named_steps.get("model")
                 if not preprocessor or not model_only:
-                    return Response({"error": "Model structure not compatible for SHAP"}, status=500)
-                X_transformed = preprocessor.transform(X)
-                feature_names = preprocessor.get_feature_names_out()
+                    return Response({"error": "Model structure not compatible for Explanation"}, status=500)
+                try:
+                    feature_names = preprocessor.get_feature_names_out()
+                except:
+                    feature_names = [f"Feature_{i}" for i in range(X_full.shape[1] * 3)] # Generous fallback
             else:
                 model_only = pipeline
-                X_transformed = X
-                feature_names = X.columns
-            
-            # Convert sparse to dense if necessary
-            if hasattr(X_transformed, "toarray"):
-                X_transformed = X_transformed.toarray()
-                
-            explainer = shap.TreeExplainer(model_only)
-            shap_values = explainer.shap_values(X_transformed)
-            
-            # Handle binary classifier output (list or 3rd dimension)
-            if isinstance(shap_values, list):
-                sv = shap_values[1] if len(shap_values) > 1 else shap_values[0]
-            elif isinstance(shap_values, np.ndarray) and len(shap_values.shape) == 3:
-                sv = shap_values[:, :, 1] if shap_values.shape[2] > 1 else shap_values[:, :, 0]
+                feature_names = X_full.columns
+
+            # ULTRA FAST PATH: Use built-in model feature importances (0 extra RAM overhead)
+            if hasattr(model_only, "feature_importances_"):
+                raw_importances = model_only.feature_importances_
+                n_features = min(len(feature_names), len(raw_importances))
+                feature_names = feature_names[:n_features]
+                shap_importance = raw_importances[:n_features]
             else:
-                sv = shap_values
-            
-            n_features = min(len(feature_names), sv.shape[1])
-            feature_names = feature_names[:n_features]
-            sv_slice = sv[:, :n_features]
-            
-            shap_importance = np.abs(sv_slice).mean(axis=0)
+                # FALLBACK PATH: Run SHAP on an extremely restricted dataset to prevent OOM
+                import shap
+                df_shap = df_filtered.head(5)
+                X = prepare_model_input(df_shap, policy, service.required_features)
+                
+                if hasattr(pipeline, "named_steps"):
+                    X_transformed = preprocessor.transform(X)
+                else:
+                    X_transformed = X
+                    
+                if hasattr(X_transformed, "toarray"):
+                    X_transformed = X_transformed.toarray()
+                    
+                explainer = shap.TreeExplainer(model_only)
+                shap_values = explainer.shap_values(X_transformed)
+                
+                if isinstance(shap_values, list):
+                    sv = shap_values[1] if len(shap_values) > 1 else shap_values[0]
+                elif isinstance(shap_values, np.ndarray) and len(shap_values.shape) == 3:
+                    sv = shap_values[:, :, 1] if shap_values.shape[2] > 1 else shap_values[:, :, 0]
+                else:
+                    sv = shap_values
+                
+                n_features = min(len(feature_names), sv.shape[1])
+                feature_names = feature_names[:n_features]
+                sv_slice = sv[:, :n_features]
+                shap_importance = np.abs(sv_slice).mean(axis=0)
             
             shap_table = pd.DataFrame({
                 "feature": feature_names,
